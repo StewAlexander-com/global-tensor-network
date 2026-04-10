@@ -218,10 +218,10 @@ main{position:relative;overflow:hidden}
 .ig-fact-src{font-size:11px;color:var(--color-text-faint);font-weight:400;display:block;margin-top:2px}
 
 /* ── TL;DR badge ── */
-.ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:12px;font-weight:600;padding:3px 10px;border-radius:10px;margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.04em}
+.ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:12px;font-weight:600;padding:4px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.04em;line-height:1}
 
 /* ── Node role badge ── */
-.ig-role{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
+.ig-role{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.05em;line-height:1}
 .ig-role.amplifier{background:rgba(63,185,80,0.15);color:var(--color-positive)}
 .ig-role.destabilizer{background:rgba(248,81,73,0.15);color:var(--color-negative)}
 .ig-role.bridge{background:rgba(210,153,34,0.15);color:var(--color-warning)}
@@ -377,7 +377,7 @@ main{position:relative;overflow:hidden}
 #panel-title{letter-spacing:0.04em;text-transform:uppercase;font-size:clamp(16px,3.5vw,20px)}
 .panel-section h3{letter-spacing:0.1em}
 .panel-section h3{font-size:0.85rem}
-  .ig-tldr{font-size:0.85rem;padding:3px 10px}
+  .ig-tldr{font-size:0.85rem;padding:4px 10px}
   .desc-text{font-size:0.95rem}
   .ig-stats{gap:4px}
   .ig-stat{padding:6px 8px}
@@ -396,7 +396,7 @@ main{position:relative;overflow:hidden}
   .ig-edge-wt{font-size:1.3rem}
   .coupling-badge{font-size:0.8rem}
   .source-tag{font-size:0.75rem}
-  .ig-role{font-size:0.85rem;padding:3px 9px;margin-left:4px}
+  .ig-role{font-size:0.85rem;padding:4px 9px}
   .ig-sysbar-label{font-size:0.75rem}
   .ig-sysbar-counts{font-size:0.8rem}
   .ig-strength{font-size:0.85rem;padding:3px 8px}
@@ -1791,7 +1791,7 @@ function showNodePanel(node) {
   panelTitle.innerHTML = `<span style="color:${node.color};margin-right:6px">${node.icon}</span>${node.label}`;
 
   /* TL;DR + Role + Desc */
-  let html = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:var(--space-1)">
+  let html = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:var(--space-2)">
     <div class="ig-tldr">TL;DR</div>
     <div class="ig-role ${roleInfo.role}">${roleInfo.label}</div>
   </div>
