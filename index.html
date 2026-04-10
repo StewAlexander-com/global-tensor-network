@@ -103,36 +103,71 @@ main{position:relative;overflow:hidden}
 .coupling-badge.mixed{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 
 /* ═══════════════════ DETAIL PANEL ═══════════════════ */
-#detail-panel{position:absolute;top:0;right:0;width:360px;max-width:92vw;height:100%;background:var(--color-surface);border-left:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform 300ms var(--ease-out);z-index:150;display:flex;flex-direction:column;overflow:hidden}
+#detail-panel{position:absolute;top:0;right:0;width:340px;max-width:92vw;height:100%;background:var(--color-surface);border-left:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform 300ms var(--ease-out);z-index:150;display:flex;flex-direction:column;overflow:hidden}
 #detail-panel.open{transform:translateX(0)}
-.panel-header{display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border);flex-shrink:0}
-.panel-header h2{font-size:var(--text-lg);font-weight:700;display:flex;align-items:center;gap:var(--space-2)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-border);flex-shrink:0}
+.panel-header h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:var(--space-1)}
 .panel-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);font-size:16px;color:var(--color-text-muted);transition:background var(--transition)}
 .panel-close:hover{background:var(--color-surface-2);color:var(--color-text)}
-.panel-body{flex:1;overflow-y:auto;padding:var(--space-3) var(--space-4)}
-.panel-body::-webkit-scrollbar{width:5px}
+.panel-body{flex:1;overflow-y:auto;padding:var(--space-2) var(--space-3)}
+.panel-body::-webkit-scrollbar{width:4px}
 .panel-body::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
-.panel-section{margin-bottom:var(--space-6)}
-.panel-section h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);margin-bottom:var(--space-2)}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2)}
-.stat-card{background:var(--color-surface-2);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3)}
-.stat-card .stat-value{font-family:var(--font-mono);font-size:var(--text-lg);font-weight:700;line-height:1.2}
-.stat-card .stat-label{font-size:10px;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.06em}
-.desc-text{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.6}
-.desc-text p{margin-bottom:var(--space-2);max-width:none}
-.key-box{background:var(--color-surface-2);border-left:3px solid var(--color-primary);padding:var(--space-2) var(--space-3);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:var(--text-xs);margin-bottom:var(--space-2)}
-.key-box strong{color:var(--color-primary)}
-.source-tag{font-size:10px;color:var(--color-primary);display:inline-block;margin-top:2px}
-.coupling-list{list-style:none}
-.coupling-item{display:flex;align-items:flex-start;gap:var(--space-2);padding:var(--space-2) 0;border-bottom:1px solid var(--color-border);font-size:var(--text-xs);cursor:pointer;transition:background var(--transition);padding-left:var(--space-2);border-radius:var(--radius-sm)}
-.coupling-item:last-child{border-bottom:none}
-.coupling-item:hover{background:var(--color-surface-2)}
-.coupling-arrow{flex-shrink:0;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:2px}
-.coupling-arrow.push{background:rgba(63,185,80,0.15);color:var(--color-positive)}
-.coupling-arrow.pull{background:rgba(248,81,73,0.15);color:var(--color-negative)}
-.coupling-arrow.mix{background:rgba(210,153,34,0.15);color:var(--color-warning)}
-.coupling-target{font-weight:600}
-.coupling-desc{color:var(--color-text-muted);margin-top:1px;line-height:1.4}
+.panel-section{margin-bottom:var(--space-3)}
+.panel-section h3{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);margin-bottom:var(--space-1)}
+
+/* ── Infographic Stats Row ── */
+.ig-stats{display:flex;gap:6px;margin-bottom:var(--space-2)}
+.ig-stat{flex:1;background:var(--color-surface-2);border-radius:var(--radius-sm);padding:6px 8px;text-align:center;position:relative;overflow:hidden}
+.ig-stat .ig-val{font-family:var(--font-mono);font-size:18px;font-weight:700;line-height:1.2}
+.ig-stat .ig-lbl{font-size:9px;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
+
+/* ── Weight bar (horizontal) ── */
+.ig-wbar{height:4px;border-radius:2px;background:var(--color-surface-2);margin-top:4px;overflow:hidden}
+.ig-wbar-fill{height:100%;border-radius:2px;transition:width 400ms var(--ease-out)}
+
+/* ── Key fact callout ── */
+.ig-fact{display:flex;gap:8px;align-items:flex-start;background:var(--color-surface-2);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:var(--space-2);border-left:3px solid var(--color-primary)}
+.ig-fact-icon{font-size:16px;flex-shrink:0;line-height:1.2}
+.ig-fact-text{font-size:12px;font-weight:600;color:var(--color-primary);line-height:1.35}
+.ig-fact-src{font-size:9px;color:var(--color-text-faint);font-weight:400;display:block;margin-top:2px}
+
+/* ── TL;DR badge ── */
+.ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.04em}
+
+/* ── Coupling flow chips ── */
+.ig-flows{display:flex;flex-direction:column;gap:4px}
+.ig-flow{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--color-surface-2);border-radius:var(--radius-sm);font-size:11px;cursor:pointer;transition:background 120ms;flex-wrap:wrap}
+.ig-flow:hover{background:var(--color-border)}
+.ig-flow-arrow{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.ig-flow-arrow.push{background:rgba(63,185,80,0.18);color:var(--color-positive)}
+.ig-flow-arrow.pull{background:rgba(248,81,73,0.18);color:var(--color-negative)}
+.ig-flow-arrow.mix{background:rgba(210,153,34,0.18);color:var(--color-warning)}
+.ig-flow-name{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ig-flow-w{font-family:var(--font-mono);font-size:10px;color:var(--color-text-faint);flex-shrink:0}
+.ig-flow-bar{width:40px;height:4px;border-radius:2px;background:var(--color-surface);flex-shrink:0;overflow:hidden}
+.ig-flow-bar-fill{height:100%;border-radius:2px}
+
+/* ── Coupling detail (expanded) ── */
+.ig-flow-detail{font-size:10px;color:var(--color-text-muted);line-height:1.4;padding:3px 0 0 24px;display:none;width:100%;flex-basis:100%}
+.ig-flow.expanded .ig-flow-detail{display:block}
+
+/* ── Edge panel visual ── */
+.ig-edge-vis{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;margin-bottom:var(--space-2)}
+.ig-edge-node{text-align:center;font-size:11px;font-weight:600}
+.ig-edge-node .ig-en-icon{font-size:20px;display:block;margin-bottom:2px}
+.ig-edge-arrow{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ig-edge-arrow svg{width:40px;height:16px}
+.ig-edge-wt{font-family:var(--font-mono);font-size:18px;font-weight:700}
+.ig-edge-wt-bar{width:80px;height:6px;border-radius:3px;background:var(--color-surface-2);overflow:hidden}
+.ig-edge-wt-bar-fill{height:100%;border-radius:3px}
+
+/* ── Desc text ── */
+.desc-text{font-size:11px;color:var(--color-text-muted);line-height:1.5}
+.source-tag{font-size:9px;color:var(--color-primary);display:inline-block;margin-top:2px}
+.coupling-badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 5px;border-radius:var(--radius-sm);text-transform:uppercase;letter-spacing:0.04em}
+.coupling-badge.positive{background:rgba(63,185,80,0.15);color:var(--color-positive)}
+.coupling-badge.negative{background:rgba(248,81,73,0.15);color:var(--color-negative)}
+.coupling-badge.mixed{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 
 /* ═══════════════════ FOCUS MODE ═══════════════════ */
 .focused-label{font-size:14px!important;font-weight:700!important;text-shadow:0 2px 8px var(--color-bg),0 0 16px var(--color-bg),0 0 32px var(--color-bg)!important}
@@ -174,8 +209,32 @@ main{position:relative;overflow:hidden}
   .header-btn{padding:2px 6px;font-size:11px}
   .scenario-btn{padding:var(--space-1) 6px;font-size:11px}
   #scenario-bar{gap:2px}
-  #detail-panel{width:100vw;max-width:100vw}
   #legend{display:none}
+  /* Bottom sheet panel */
+  #detail-panel{
+    top:auto;bottom:0;left:0;right:0;
+    width:100vw;max-width:100vw;height:auto;
+    max-height:35vh;min-height:20vh;
+    border-left:none;border-top:1px solid var(--color-border);
+    border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+    transform:translateY(100%);transition:transform 300ms var(--ease-out);
+    background:rgba(19,25,32,0.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  }
+  [data-theme="light"] #detail-panel{background:rgba(255,255,255,0.92)}
+  #detail-panel.open{transform:translateY(0)}
+  .panel-header{padding:var(--space-1) var(--space-3)}
+  .panel-header::before{content:'';display:block;width:32px;height:4px;border-radius:2px;background:var(--color-border);position:absolute;top:6px;left:50%;transform:translateX(-50%)}
+  .panel-header{padding-top:14px;position:relative}
+  .panel-header h2{font-size:14px}
+  .panel-body{padding:var(--space-1) var(--space-3) var(--space-2)}
+  .ig-stats{gap:4px}
+  .ig-stat{padding:4px 6px}
+  .ig-stat .ig-val{font-size:15px}
+  .ig-fact{padding:6px 8px}
+  .ig-fact-text{font-size:11px}
+  .ig-flow{padding:4px 6px;font-size:10px}
+  .ig-flow-arrow{width:16px;height:16px;font-size:9px}
+  .panel-section{margin-bottom:var(--space-2)}
 }
 :focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--radius-sm)}
 </style>
@@ -908,54 +967,96 @@ const panelBody = document.getElementById('panel-body');
 function showNodePanel(node) {
   const outgoing = EDGES.filter(e => e.s === node.id);
   const incoming = EDGES.filter(e => e.t === node.id);
+  const all = [...outgoing, ...incoming];
+  const avgW = (all.reduce((s,e) => s + e.w, 0) / Math.max(node.connections, 1)).toFixed(1);
+  const maxConn = Math.max(...NODES.map(n => n.connections));
+  const connPct = Math.round((node.connections / maxConn) * 100);
+  const pushCount = all.filter(e => e.type === 'positive').length;
+  const pullCount = all.filter(e => e.type === 'negative').length;
+  const mixCount = all.filter(e => e.type === 'mixed').length;
 
   panelTitle.textContent = `${node.icon} ${node.label}`;
 
-  let html = `
-    <div class="panel-section"><div class="desc-text"><p>${node.desc}</p></div></div>
-    <div class="panel-section">
-      <div class="stat-grid">
-        <div class="stat-card"><div class="stat-value" style="color:var(--color-primary)">${node.connections}</div><div class="stat-label">Links</div></div>
-        <div class="stat-card"><div class="stat-value" style="color:var(--color-positive)">${outgoing.length}</div><div class="stat-label">Outgoing</div></div>
-        <div class="stat-card"><div class="stat-value" style="color:var(--color-negative)">${incoming.length}</div><div class="stat-label">Incoming</div></div>
-        <div class="stat-card"><div class="stat-value">${(([...outgoing,...incoming].reduce((s,e)=>s+e.w,0)/Math.max(node.connections,1)).toFixed(1))}</div><div class="stat-label">Avg Weight</div></div>
-      </div>
-    </div>
-    <div class="panel-section"><div class="key-box"><strong>${node.fact}</strong><div class="source-tag">${node.src}</div></div></div>`;
+  /* TL;DR + Stats */
+  let html = `<div class="ig-tldr">TL;DR</div>
+    <div class="desc-text" style="margin-bottom:6px">${node.desc}</div>
+    <div class="ig-stats">
+      <div class="ig-stat"><div class="ig-val" style="color:var(--color-primary)">${node.connections}</div><div class="ig-lbl">Links</div>
+        <div class="ig-wbar"><div class="ig-wbar-fill" style="width:${connPct}%;background:var(--color-primary)"></div></div></div>
+      <div class="ig-stat"><div class="ig-val" style="color:var(--color-positive)">${outgoing.length}</div><div class="ig-lbl">Out</div></div>
+      <div class="ig-stat"><div class="ig-val" style="color:var(--color-negative)">${incoming.length}</div><div class="ig-lbl">In</div></div>
+      <div class="ig-stat"><div class="ig-val">${avgW}</div><div class="ig-lbl">Avg W</div>
+        <div class="ig-wbar"><div class="ig-wbar-fill" style="width:${(avgW/5*100).toFixed(0)}%;background:var(--color-warning)"></div></div></div>
+    </div>`;
 
-  const renderList = (title, edges, isOut) => {
+  /* Push/Pull balance bar */
+  if (all.length > 0) {
+    const total = all.length;
+    const pushPct = (pushCount/total*100).toFixed(0);
+    const pullPct = (pullCount/total*100).toFixed(0);
+    const mixPct = (mixCount/total*100).toFixed(0);
+    html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:10px">
+      <span style="color:var(--color-positive)">+${pushCount}</span>
+      <div style="flex:1;height:6px;border-radius:3px;display:flex;overflow:hidden;background:var(--color-surface-2)">
+        <div style="width:${pushPct}%;background:var(--color-positive)"></div>
+        <div style="width:${mixPct}%;background:var(--color-warning)"></div>
+        <div style="width:${pullPct}%;background:var(--color-negative)"></div>
+      </div>
+      <span style="color:var(--color-negative)">−${pullCount}</span>
+    </div>`;
+  }
+
+  /* Key fact callout */
+  html += `<div class="ig-fact"><div class="ig-fact-icon">💡</div><div><div class="ig-fact-text">${node.fact}</div><span class="ig-fact-src">${node.src}</span></div></div>`;
+
+  /* Coupling flows */
+  const renderFlows = (title, edges, isOut) => {
     if (!edges.length) return '';
-    let h = `<div class="panel-section"><h3>${title}</h3><ul class="coupling-list">`;
+    let h = `<div class="panel-section"><h3>${title}</h3><div class="ig-flows">`;
     edges.forEach(e => {
       const other = NODES[idxMap[isOut ? e.t : e.s]];
       const ac = e.type === 'positive' ? 'push' : e.type === 'negative' ? 'pull' : 'mix';
       const as = e.type === 'positive' ? '+' : e.type === 'negative' ? '−' : '±';
-      h += `<li class="coupling-item"><div class="coupling-arrow ${ac}">${as}</div><div><div class="coupling-target">${other.icon} ${other.label} <span style="font-family:var(--font-mono);font-size:10px;color:var(--color-text-faint)">w:${e.w}</span></div><div class="coupling-desc">${e.mech}</div><div class="source-tag">${e.cite}</div></div></li>`;
+      const barColor = e.type === 'positive' ? 'var(--color-positive)' : e.type === 'negative' ? 'var(--color-negative)' : 'var(--color-warning)';
+      h += `<div class="ig-flow" onclick="this.classList.toggle('expanded')">
+        <div class="ig-flow-arrow ${ac}">${as}</div>
+        <div class="ig-flow-name">${other.icon} ${other.label}</div>
+        <div class="ig-flow-bar"><div class="ig-flow-bar-fill" style="width:${e.w/5*100}%;background:${barColor}"></div></div>
+        <div class="ig-flow-w">${e.w}/5</div>
+        <div class="ig-flow-detail">${e.mech}<br><span class="source-tag">${e.cite}</span></div>
+      </div>`;
     });
-    return h + '</ul></div>';
+    return h + '</div></div>';
   };
 
-  html += renderList('Outgoing Couplings', outgoing, true);
-  html += renderList('Incoming Couplings', incoming, false);
+  html += renderFlows('Outgoing', outgoing, true);
+  html += renderFlows('Incoming', incoming, false);
   panelBody.innerHTML = html;
   panelEl.classList.add('open');
 }
 
 function showEdgePanel(edge, si, ti) {
   const sn = NODES[si], tn = NODES[ti];
-  const tl = { positive: 'Push (reinforcing)', negative: 'Pull (degrading)', mixed: 'Mixed (bidirectional)' };
+  const typeLabel = { positive: 'PUSH', negative: 'PULL', mixed: 'MIXED' };
+  const typeColor = { positive: 'var(--color-positive)', negative: 'var(--color-negative)', mixed: 'var(--color-warning)' };
+  const arrowColor = typeColor[edge.type];
+
   panelTitle.textContent = `${sn.icon} → ${tn.icon}`;
   panelBody.innerHTML = `
-    <div class="panel-section"><h3>Coupling</h3>
-      <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3)">
-        <span style="font-weight:600">${sn.label}</span><span style="color:var(--color-text-faint)">→</span><span style="font-weight:600">${tn.label}</span>
+    <div class="ig-edge-vis">
+      <div class="ig-edge-node"><span class="ig-en-icon">${sn.icon}</span>${sn.label}</div>
+      <div class="ig-edge-arrow">
+        <svg viewBox="0 0 40 16" fill="none"><path d="M0 8h32M28 3l6 5-6 5" stroke="${arrowColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="coupling-badge ${edge.type}">${typeLabel[edge.type]}</span>
       </div>
-      <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-3)">
-        <span class="coupling-badge ${edge.type}">${tl[edge.type]}</span>
-        <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">Weight: ${edge.w}/5</span>
-      </div>
+      <div class="ig-edge-node"><span class="ig-en-icon">${tn.icon}</span>${tn.label}</div>
     </div>
-    <div class="panel-section"><h3>Mechanism</h3><div class="desc-text"><p>${edge.mech}</p></div><div class="source-tag" style="margin-top:var(--space-2)">${edge.cite}</div></div>`;
+    <div style="text-align:center;margin-bottom:8px">
+      <div class="ig-edge-wt" style="color:${arrowColor}">${edge.w}<span style="font-size:12px;color:var(--color-text-faint)">/5</span></div>
+      <div class="ig-edge-wt-bar" style="margin:4px auto 0"><div class="ig-edge-wt-bar-fill" style="width:${edge.w/5*100}%;background:${arrowColor}"></div></div>
+      <div style="font-size:10px;color:var(--color-text-muted);margin-top:4px">Coupling Strength</div>
+    </div>
+    <div class="ig-fact"><div class="ig-fact-icon">⚙️</div><div><div class="ig-fact-text" style="color:var(--color-text)">${edge.mech}</div><span class="ig-fact-src">${edge.cite}</span></div></div>`;
   panelEl.classList.add('open');
 }
 
