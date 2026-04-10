@@ -2074,12 +2074,14 @@ const AudioEngine = (() => {
   let masterGain = null;
   let sfxGain = null;
   let ambientGain = null;
+  let ambientFilter = null;
+  let ambientComp = null;
   let ambientSource = null;
   let ambientBuffer = null;
   let audioEnabled = true;
   let audioInitialized = false;
   let ambientStarted = false;
-  const AMBIENT_VOLUME = 0.08;
+  const AMBIENT_VOLUME = 0.06;
   const SFX_VOLUME = 0.5;
 
   function init() {
@@ -2094,8 +2096,25 @@ const AudioEngine = (() => {
       sfxGain.gain.value = SFX_VOLUME;
       sfxGain.connect(masterGain);
 
+      /* Ambient chain: source → lowpass → compressor → ambientGain → master
+         Lowpass rolls off highs so the track sits behind the UI SFX.
+         Compressor keeps dynamics even so nothing jumps out. */
+      ambientFilter = ctx.createBiquadFilter();
+      ambientFilter.type = 'lowpass';
+      ambientFilter.frequency.value = 2800; // gentle rolloff above 2.8kHz
+      ambientFilter.Q.value = 0.5;
+
+      ambientComp = ctx.createDynamicsCompressor();
+      ambientComp.threshold.value = -30;
+      ambientComp.knee.value = 20;
+      ambientComp.ratio.value = 4;
+      ambientComp.attack.value = 0.05;
+      ambientComp.release.value = 0.25;
+
       ambientGain = ctx.createGain();
       ambientGain.gain.value = 0;
+      ambientFilter.connect(ambientComp);
+      ambientComp.connect(ambientGain);
       ambientGain.connect(masterGain);
 
       audioInitialized = true;
@@ -2127,7 +2146,7 @@ const AudioEngine = (() => {
     ambientSource = ctx.createBufferSource();
     ambientSource.buffer = ambientBuffer;
     ambientSource.loop = true;
-    ambientSource.connect(ambientGain);
+    ambientSource.connect(ambientFilter);
     ambientSource.start(0);
     // Smooth fade in over 3 seconds
     ambientGain.gain.cancelScheduledValues(ctx.currentTime);
