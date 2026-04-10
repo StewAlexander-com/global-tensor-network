@@ -454,6 +454,9 @@ main{position:relative;overflow:hidden}
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 /* ═══════════════════════════════════════════════
    MODEL DATA — 15 nodes, 60+ directed edges
@@ -675,10 +678,23 @@ const positions3D = computeLayout();
 const canvas = document.getElementById('three-canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
 camera.position.set(0, 0, 110);
+
+/* ── Post-processing: Bloom ── */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(canvas.clientWidth, canvas.clientHeight),
+  0.55,  // strength — subtle but noticeable
+  0.6,   // radius
+  0.35   // threshold — only bright things bloom
+);
+composer.addPass(bloomPass);
 
 const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 const controls = new OrbitControls(camera, canvas);
@@ -739,14 +755,75 @@ controls.addEventListener('start', () => {
 
 function updateBg() {
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-  scene.background = new THREE.Color(isDark ? 0x0a0e14 : 0xeef1f5);
+  scene.background = new THREE.Color(isDark ? 0x060a10 : 0xeef1f5);
+  // Depth fog — objects fade into the background at distance
+  scene.fog = isDark
+    ? new THREE.FogExp2(0x060a10, 0.0045)
+    : new THREE.FogExp2(0xeef1f5, 0.003);
+  // Adjust bloom for theme
+  bloomPass.strength = isDark ? 0.55 : 0.12;
+  bloomPass.threshold = isDark ? 0.35 : 0.75;
+  // Stars: visible in dark mode, hidden in light
+  scene.traverse(obj => {
+    if (obj.userData.isStarField) obj.visible = isDark;
+  });
+  // Adjust lighting for theme
+  renderer.toneMappingExposure = isDark ? 1.1 : 1.4;
 }
 updateBg();
 
-// Ambient light
-scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+/* ── Lighting rig: dramatic multi-source ── */
+// Soft ambient fill (dimmer than before — let directional lights do the work)
+scene.add(new THREE.AmbientLight(0x304060, 0.4));
+// Key light — cool teal from upper-right (like the OG image god rays)
+const keyLight = new THREE.DirectionalLight(0x5fa8b8, 0.9);
+keyLight.position.set(40, 80, 60);
+scene.add(keyLight);
+// Fill light — warm from lower-left
+const fillLight = new THREE.DirectionalLight(0x8068a0, 0.3);
+fillLight.position.set(-50, -30, 40);
+scene.add(fillLight);
+// Rim/back light — subtle cyan glow from behind
+const rimLight = new THREE.PointLight(0x4fc3d4, 0.6, 250);
+rimLight.position.set(0, 0, -80);
+scene.add(rimLight);
+// Top volumetric hint — bright point above
+const topLight = new THREE.PointLight(0x6ec8d6, 0.5, 300);
+topLight.position.set(0, 100, 20);
+scene.add(topLight);
 
-/* ─── EDGES ─── */
+/* ── Background star field / particles ── */
+(function createStarField() {
+  const count = 600;
+  const geom = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const sizes = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    // Spread particles in a large sphere around the scene
+    const r = 120 + Math.random() * 250;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = r * Math.cos(phi);
+    sizes[i] = 0.3 + Math.random() * 1.2;
+  }
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+  const mat = new THREE.PointsMaterial({
+    color: 0x4f6880,
+    transparent: true,
+    opacity: 0.4,
+    sizeAttenuation: true,
+    size: 0.6,
+    fog: true
+  });
+  const stars = new THREE.Points(geom, mat);
+  stars.userData.isStarField = true;
+  scene.add(stars);
+})();
+
+/* ─── EDGES (with additive glow) ─── */
 const edgeMeshes = [];
 const EDGE_COLORS = { positive: 0x3fb950, negative: 0xf85149, mixed: 0xd29922 };
 const EDGE_COLORS_DIM = { positive: 0x1a3d20, negative: 0x3d1a18, mixed: 0x3d2e10 };
@@ -761,13 +838,28 @@ EDGES.forEach((e, ei) => {
   const mat = new THREE.LineBasicMaterial({
     color: EDGE_COLORS[e.type],
     transparent: true,
-    opacity: 0.25,
-    linewidth: 1
+    opacity: 0.3,
+    linewidth: 1,
+    fog: true
   });
   const line = new THREE.Line(geom, mat);
   line.userData = { idx: ei, edge: e, si, ti };
   edgeGroup.add(line);
   edgeMeshes.push(line);
+
+  // Glow line — wider, additive, very faint
+  const glowMat = new THREE.LineBasicMaterial({
+    color: EDGE_COLORS[e.type],
+    transparent: true,
+    opacity: 0.08,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: true
+  });
+  const glowLine = new THREE.Line(geom.clone(), glowMat);
+  glowLine.userData = { isGlow: true, parentIdx: ei };
+  edgeGroup.add(glowLine);
+  line.userData.glowLine = glowLine;
 });
 
 /* ─── NODES (small dots) ─── */
@@ -775,23 +867,62 @@ const nodeGroup = new THREE.Group();
 scene.add(nodeGroup);
 const nodeMeshes = [];
 
+/* ── Procedural glow sprite texture ── */
+const glowCanvas = document.createElement('canvas');
+glowCanvas.width = 128; glowCanvas.height = 128;
+const gCtx = glowCanvas.getContext('2d');
+const gradient = gCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+gradient.addColorStop(0, 'rgba(255,255,255,1)');
+gradient.addColorStop(0.15, 'rgba(255,255,255,0.6)');
+gradient.addColorStop(0.4, 'rgba(255,255,255,0.15)');
+gradient.addColorStop(1, 'rgba(255,255,255,0)');
+gCtx.fillStyle = gradient;
+gCtx.fillRect(0, 0, 128, 128);
+const glowTexture = new THREE.CanvasTexture(glowCanvas);
+
 NODES.forEach((n, i) => {
   // Small sphere — radius based on connections but kept small
   const r = 0.55 + n.connections * 0.1;
+  // Use MeshStandardMaterial for lighting interaction + emissive glow
+  const col = new THREE.Color(n.color);
   const geom = new THREE.SphereGeometry(r, 16, 12);
-  const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color(n.color) });
+  const mat = new THREE.MeshStandardMaterial({
+    color: col,
+    emissive: col,
+    emissiveIntensity: 0.8,
+    metalness: 0.2,
+    roughness: 0.5,
+  });
   const mesh = new THREE.Mesh(geom, mat);
   mesh.position.copy(positions3D[i]);
   mesh.userData = { idx: i, node: n };
   nodeGroup.add(mesh);
   nodeMeshes.push(mesh);
 
-  // Subtle glow ring
+  // Sprite-based soft glow halo (like the OG image luminous orbs)
+  const spriteMat = new THREE.SpriteMaterial({
+    map: glowTexture,
+    color: col,
+    transparent: true,
+    opacity: 0.35,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: true
+  });
+  const sprite = new THREE.Sprite(spriteMat);
+  const haloSize = (r + 1.5) * 3.5; // soft halo ~3.5x node radius
+  sprite.scale.set(haloSize, haloSize, 1);
+  sprite.position.copy(positions3D[i]);
+  sprite.userData = { isHalo: true, parentIdx: i };
+  nodeGroup.add(sprite);
+  n._halo = sprite;
+
+  // Keep the ring for focus indication but make it subtler in default state
   const ringGeom = new THREE.RingGeometry(r + 0.15, r + 0.55, 24);
   const ringMat = new THREE.MeshBasicMaterial({
-    color: new THREE.Color(n.color),
+    color: col,
     transparent: true,
-    opacity: 0.15,
+    opacity: 0.1,
     side: THREE.DoubleSide
   });
   const ring = new THREE.Mesh(ringGeom, ringMat);
@@ -981,18 +1112,30 @@ const FOCUS_ANIM_MS = 700;
 
 function resetHighlights() {
   nodeMeshes.forEach((m, i) => {
-    m.material.color.set(NODES[i].color);
+    const col = new THREE.Color(NODES[i].color);
+    m.material.color.set(col);
+    m.material.emissive.set(col);
+    m.material.emissiveIntensity = 0.8;
     m.material.opacity = 1;
     m.material.transparent = false;
-    NODES[i]._ring.material.opacity = 0.15;
+    NODES[i]._ring.material.opacity = 0.1;
+    // Reset halo
+    if (NODES[i]._halo) {
+      NODES[i]._halo.material.opacity = 0.35;
+      NODES[i]._halo.material.color.set(col);
+    }
     // Reset scale
-    const baseR = 0.55 + NODES[i].connections * 0.1;
     m.scale.setScalar(1);
     savedScales[i] = 1;
   });
   edgeMeshes.forEach((line, i) => {
     line.material.color.set(EDGE_COLORS[EDGES[i].type]);
-    line.material.opacity = 0.25;
+    line.material.opacity = 0.3;
+    // Reset glow line
+    if (line.userData.glowLine) {
+      line.userData.glowLine.material.opacity = 0.08;
+      line.userData.glowLine.material.color.set(EDGE_COLORS[EDGES[i].type]);
+    }
   });
   labelEls.forEach(el => {
     el.style.opacity = '1';
@@ -1015,7 +1158,12 @@ function highlightNode(nodeId) {
     const vis = connected.has(nid);
     m.material.transparent = true;
     m.material.opacity = isFocus ? 1 : vis ? 0.7 : 0.06;
+    m.material.emissiveIntensity = isFocus ? 1.5 : vis ? 0.6 : 0.1;
     NODES[i]._ring.material.opacity = isFocus ? 0.5 : vis ? 0.2 : 0.02;
+    // Halo: bright for focused, dim for others
+    if (NODES[i]._halo) {
+      NODES[i]._halo.material.opacity = isFocus ? 0.7 : vis ? 0.2 : 0.02;
+    }
     // Scale up focused node
     if (isFocus) {
       m.scale.setScalar(1.8);
@@ -1030,6 +1178,10 @@ function highlightNode(nodeId) {
     const e = EDGES[i];
     const active = e.s === nodeId || e.t === nodeId;
     line.material.opacity = active ? 0.7 : 0.02;
+    // Glow line follows
+    if (line.userData.glowLine) {
+      line.userData.glowLine.material.opacity = active ? 0.2 : 0.005;
+    }
   });
 
   labelEls.forEach((el, i) => {
@@ -1125,14 +1277,20 @@ function applyScenario(id) {
     const involved = involvedNodes.has(nid);
     m.material.transparent = true;
     m.material.opacity = involved ? 1 : 0.1;
+    m.material.emissiveIntensity = involved ? 1.0 : 0.1;
     NODES[i]._ring.material.opacity = involved ? 0.4 : 0.02;
+    if (NODES[i]._halo) NODES[i]._halo.material.opacity = involved ? 0.45 : 0.02;
 
     if (sc.stressed.includes(nid)) {
       m.material.color.set(0xf85149);
+      m.material.emissive.set(0xf85149);
       NODES[i]._ring.material.color.set(0xf85149);
+      if (NODES[i]._halo) NODES[i]._halo.material.color.set(0xf85149);
     } else if (sc.improved.includes(nid)) {
       m.material.color.set(0x3fb950);
+      m.material.emissive.set(0x3fb950);
       NODES[i]._ring.material.color.set(0x3fb950);
+      if (NODES[i]._halo) NODES[i]._halo.material.color.set(0x3fb950);
     }
   });
 
@@ -1141,6 +1299,9 @@ function applyScenario(id) {
     const active = hlSet.has(`${e.s}-${e.t}`) || hlSet.has(`${e.t}-${e.s}`);
     line.material.opacity = active ? 0.8 : 0.03;
     if (active) line.material.color.set(EDGE_COLORS[e.type]);
+    if (line.userData.glowLine) {
+      line.userData.glowLine.material.opacity = active ? 0.2 : 0.005;
+    }
   });
 
   labelEls.forEach((el, i) => {
@@ -1346,6 +1507,8 @@ let initialResizeDone = false;
 function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   renderer.setSize(w, h, false);
+  composer.setSize(w, h);
+  bloomPass.resolution.set(w, h);
   camera.aspect = w / h;
   const aspect = w / h;
   if (aspect < 1) {
@@ -1365,16 +1528,27 @@ resize();
 let autoRotate = true;
 controls.addEventListener('start', () => { autoRotate = false; });
 
+let _time = 0;
 function animate() {
   requestAnimationFrame(animate);
+  _time += 0.016; // ~60fps dt
   if (autoRotate) {
     nodeGroup.rotation.y += 0.001;
     edgeGroup.rotation.y += 0.001;
   }
+  // Subtle halo pulse — gentle breathing effect
+  NODES.forEach((n, i) => {
+    if (n._halo && n._halo.material.opacity > 0.05) {
+      const baseOpacity = n._halo.userData._baseOpacity || n._halo.material.opacity;
+      if (!n._halo.userData._baseOpacity) n._halo.userData._baseOpacity = baseOpacity;
+      const pulse = 1 + 0.15 * Math.sin(_time * 1.2 + i * 1.7);
+      n._halo.material.opacity = baseOpacity * pulse;
+    }
+  });
   updateFocusAnim();
   controls.update();
   updateRings();
-  renderer.render(scene, camera);
+  composer.render();
   updateLabels();
 }
 animate();
