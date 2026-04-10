@@ -507,6 +507,9 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 
 /* ═══════════════════════════════════════════════
    MODEL DATA — 15 nodes, 60+ directed edges
@@ -1124,35 +1127,61 @@ const EDGE_COLORS_DIM = { positive: 0x1a3d20, negative: 0x3d1a18, mixed: 0x3d2e1
 const edgeGroup = new THREE.Group();
 scene.add(edgeGroup);
 
+const isMobileDevice = window.innerWidth < 768;
+const EDGE_BASE_WIDTH = isMobileDevice ? 3.0 : 1.8;
+const EDGE_GLOW_WIDTH = isMobileDevice ? 6.0 : 3.5;
+
 EDGES.forEach((e, ei) => {
   const si = idxMap[e.s], ti = idxMap[e.t];
-  const pts = [positions3D[si].clone(), positions3D[ti].clone()];
-  const geom = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({
+  const p0 = positions3D[si], p1 = positions3D[ti];
+
+  // Fat line geometry (Line2)
+  const geom = new LineGeometry();
+  geom.setPositions([p0.x, p0.y, p0.z, p1.x, p1.y, p1.z]);
+  const mat = new LineMaterial({
     color: EDGE_COLORS[e.type],
     transparent: true,
-    opacity: 0.3,
-    linewidth: 1,
-    fog: true
+    opacity: 0.45,
+    linewidth: EDGE_BASE_WIDTH,
+    depthWrite: false,
+    worldUnits: false,
+    alphaToCoverage: false
   });
-  const line = new THREE.Line(geom, mat);
+  mat.resolution.set(window.innerWidth, window.innerHeight);
+  const line = new Line2(geom, mat);
+  line.computeLineDistances();
   line.userData = { idx: ei, edge: e, si, ti };
   edgeGroup.add(line);
   edgeMeshes.push(line);
 
-  // Glow line — wider, additive, very faint
-  const glowMat = new THREE.LineBasicMaterial({
+  // Glow line — wider, additive
+  const glowGeom = new LineGeometry();
+  glowGeom.setPositions([p0.x, p0.y, p0.z, p1.x, p1.y, p1.z]);
+  const glowMat = new LineMaterial({
     color: EDGE_COLORS[e.type],
     transparent: true,
-    opacity: 0.08,
+    opacity: 0.12,
+    linewidth: EDGE_GLOW_WIDTH,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    fog: true
+    worldUnits: false,
+    alphaToCoverage: false
   });
-  const glowLine = new THREE.Line(geom.clone(), glowMat);
+  glowMat.resolution.set(window.innerWidth, window.innerHeight);
+  const glowLine = new Line2(glowGeom, glowMat);
+  glowLine.computeLineDistances();
   glowLine.userData = { isGlow: true, parentIdx: ei };
   edgeGroup.add(glowLine);
   line.userData.glowLine = glowLine;
+});
+
+// Keep LineMaterial resolution in sync with viewport
+window.addEventListener('resize', () => {
+  const w = window.innerWidth, h = window.innerHeight;
+  edgeMeshes.forEach(line => {
+    line.material.resolution.set(w, h);
+    if (line.userData.glowLine) line.userData.glowLine.material.resolution.set(w, h);
+  });
 });
 
 /* ─── NODES (small dots) ─── */
@@ -1402,6 +1431,7 @@ function updateRings() {
    ═══════════════════════════════════════════════ */
 const raycaster = new THREE.Raycaster();
 raycaster.params.Line = { threshold: 1.2 };
+raycaster.params.Line2 = { threshold: 4 };
 // Expose globals for QA/debugging
 const mouse = new THREE.Vector2();
 const hoverLabel = document.getElementById('hover-label');
@@ -1516,10 +1546,12 @@ function resetHighlights() {
   });
   edgeMeshes.forEach((line, i) => {
     line.material.color.set(EDGE_COLORS[EDGES[i].type]);
-    line.material.opacity = 0.3;
+    line.material.opacity = 0.45;
+    line.material.linewidth = EDGE_BASE_WIDTH;
     // Reset glow line
     if (line.userData.glowLine) {
-      line.userData.glowLine.material.opacity = 0.08;
+      line.userData.glowLine.material.opacity = 0.12;
+      line.userData.glowLine.material.linewidth = EDGE_GLOW_WIDTH;
       line.userData.glowLine.material.color.set(EDGE_COLORS[EDGES[i].type]);
     }
   });
@@ -1571,10 +1603,12 @@ function highlightNode(nodeId) {
   edgeMeshes.forEach((line, i) => {
     const e = EDGES[i];
     const active = e.s === nodeId || e.t === nodeId;
-    line.material.opacity = active ? 0.7 : 0.02;
+    line.material.opacity = active ? 0.85 : 0.06;
+    line.material.linewidth = active ? EDGE_BASE_WIDTH * 1.5 : EDGE_BASE_WIDTH * 0.6;
     // Glow line follows
     if (line.userData.glowLine) {
-      line.userData.glowLine.material.opacity = active ? 0.2 : 0.005;
+      line.userData.glowLine.material.opacity = active ? 0.3 : 0.01;
+      line.userData.glowLine.material.linewidth = active ? EDGE_GLOW_WIDTH * 1.5 : EDGE_GLOW_WIDTH * 0.6;
     }
   });
 
@@ -1697,10 +1731,12 @@ function applyScenario(id) {
   edgeMeshes.forEach((line, i) => {
     const e = EDGES[i];
     const active = hlSet.has(`${e.s}-${e.t}`) || hlSet.has(`${e.t}-${e.s}`);
-    line.material.opacity = active ? 0.8 : 0.03;
+    line.material.opacity = active ? 0.9 : 0.06;
+    line.material.linewidth = active ? EDGE_BASE_WIDTH * 1.8 : EDGE_BASE_WIDTH * 0.5;
     if (active) line.material.color.set(EDGE_COLORS[e.type]);
     if (line.userData.glowLine) {
-      line.userData.glowLine.material.opacity = active ? 0.2 : 0.005;
+      line.userData.glowLine.material.opacity = active ? 0.35 : 0.01;
+      line.userData.glowLine.material.linewidth = active ? EDGE_GLOW_WIDTH * 1.8 : EDGE_GLOW_WIDTH * 0.5;
     }
   });
 
