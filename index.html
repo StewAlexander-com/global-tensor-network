@@ -134,6 +134,30 @@ main{position:relative;overflow:hidden}
 /* ── TL;DR badge ── */
 .ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:12px;font-weight:600;padding:3px 10px;border-radius:10px;margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.04em}
 
+/* ── Node role badge ── */
+.ig-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
+.ig-role.amplifier{background:rgba(63,185,80,0.15);color:var(--color-positive)}
+.ig-role.destabilizer{background:rgba(248,81,73,0.15);color:var(--color-negative)}
+.ig-role.bridge{background:rgba(210,153,34,0.15);color:var(--color-warning)}
+.ig-role.stabilizer{background:rgba(79,152,163,0.15);color:var(--color-primary)}
+
+/* ── System effect bar ── */
+.ig-sysbar{margin-bottom:var(--space-2)}
+.ig-sysbar-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;color:var(--color-text-muted)}
+.ig-sysbar-label .green{color:var(--color-positive)}
+.ig-sysbar-label .red{color:var(--color-negative)}
+.ig-sysbar-track{height:8px;border-radius:4px;display:flex;overflow:hidden;background:var(--color-surface-2)}
+.ig-sysbar-seg{transition:width 400ms var(--ease-out)}
+.ig-sysbar-counts{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-top:3px}
+
+/* ── Coupling strength label ── */
+.ig-strength{font-size:10px;font-weight:500;padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.ig-strength.strong-pos{background:rgba(63,185,80,0.12);color:var(--color-positive)}
+.ig-strength.mod-pos{background:rgba(63,185,80,0.08);color:var(--color-positive)}
+.ig-strength.strong-neg{background:rgba(248,81,73,0.12);color:var(--color-negative)}
+.ig-strength.mod-neg{background:rgba(248,81,73,0.08);color:var(--color-negative)}
+.ig-strength.mixed{background:rgba(210,153,34,0.08);color:var(--color-warning)}
+
 /* ── Coupling flow chips ── */
 .ig-flows{display:flex;flex-direction:column;gap:4px}
 .ig-flow{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--color-surface-2);border-radius:var(--radius-sm);font-size:14px;cursor:pointer;transition:background 120ms;flex-wrap:wrap}
@@ -250,6 +274,10 @@ main{position:relative;overflow:hidden}
   .ig-edge-wt{font-size:1.15rem}
   .coupling-badge{font-size:0.7rem}
   .source-tag{font-size:0.65rem}
+  .ig-role{font-size:0.6rem;padding:2px 7px;margin-left:4px}
+  .ig-sysbar-label{font-size:0.65rem}
+  .ig-sysbar-counts{font-size:0.7rem}
+  .ig-strength{font-size:0.55rem;padding:1px 5px}
   .panel-section{margin-bottom:var(--space-2)}
 }
 :focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--radius-sm)}
@@ -980,64 +1008,94 @@ const panelEl = document.getElementById('detail-panel');
 const panelTitle = document.getElementById('panel-title');
 const panelBody = document.getElementById('panel-body');
 
+function getNodeRole(pushCount, pullCount, mixCount, outgoing) {
+  const outPos = outgoing.filter(e => e.type === 'positive').length;
+  const outNeg = outgoing.filter(e => e.type === 'negative').length;
+  if (outPos > outNeg * 2) return { role: 'amplifier', label: 'Amplifier', tip: 'Mostly strengthens other systems' };
+  if (outNeg > outPos * 2) return { role: 'destabilizer', label: 'Destabilizer', tip: 'Mostly stresses other systems' };
+  if (mixCount >= pushCount && mixCount >= pullCount) return { role: 'bridge', label: 'Bridge', tip: 'Complex mixed effects across systems' };
+  return { role: 'stabilizer', label: 'Stabilizer', tip: 'Balanced systemic influence' };
+}
+
+function getStrengthLabel(type, w) {
+  if (type === 'positive') return w >= 4 ? { cls: 'strong-pos', text: 'Strong reinforcer' } : { cls: 'mod-pos', text: 'Reinforcer' };
+  if (type === 'negative') return w >= 4 ? { cls: 'strong-neg', text: 'Critical risk' } : { cls: 'mod-neg', text: 'Stressor' };
+  return { cls: 'mixed', text: 'Double-edged' };
+}
+
 function showNodePanel(node) {
   const outgoing = EDGES.filter(e => e.s === node.id);
   const incoming = EDGES.filter(e => e.t === node.id);
   const all = [...outgoing, ...incoming];
   const avgW = (all.reduce((s,e) => s + e.w, 0) / Math.max(node.connections, 1)).toFixed(1);
-  const maxConn = Math.max(...NODES.map(n => n.connections));
-  const connPct = Math.round((node.connections / maxConn) * 100);
   const pushCount = all.filter(e => e.type === 'positive').length;
   const pullCount = all.filter(e => e.type === 'negative').length;
   const mixCount = all.filter(e => e.type === 'mixed').length;
 
+  /* Systemic impact score: weighted sum of coupling strengths */
+  const impactScore = all.reduce((s,e) => s + e.w, 0);
+  const maxImpact = Math.max(...NODES.map(n => {
+    const ne = EDGES.filter(e => e.s === n.id || e.t === n.id);
+    return ne.reduce((s,e) => s + e.w, 0);
+  }));
+  const impactPct = Math.round((impactScore / maxImpact) * 100);
+  const roleInfo = getNodeRole(pushCount, pullCount, mixCount, outgoing);
+
   panelTitle.textContent = `${node.icon} ${node.label}`;
 
-  /* TL;DR + Stats */
-  let html = `<div class="ig-tldr">TL;DR</div>
-    <div class="desc-text" style="margin-bottom:6px">${node.desc}</div>
-    <div class="ig-stats">
-      <div class="ig-stat"><div class="ig-val" style="color:var(--color-primary)">${node.connections}</div><div class="ig-lbl">Links</div>
-        <div class="ig-wbar"><div class="ig-wbar-fill" style="width:${connPct}%;background:var(--color-primary)"></div></div></div>
-      <div class="ig-stat"><div class="ig-val" style="color:var(--color-positive)">${outgoing.length}</div><div class="ig-lbl">Out</div></div>
-      <div class="ig-stat"><div class="ig-val" style="color:var(--color-negative)">${incoming.length}</div><div class="ig-lbl">In</div></div>
-      <div class="ig-stat"><div class="ig-val">${avgW}</div><div class="ig-lbl">Avg W</div>
-        <div class="ig-wbar"><div class="ig-wbar-fill" style="width:${(avgW/5*100).toFixed(0)}%;background:var(--color-warning)"></div></div></div>
-    </div>`;
+  /* TL;DR + Role + Desc */
+  let html = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:var(--space-1)">
+    <div class="ig-tldr">TL;DR</div>
+    <div class="ig-role ${roleInfo.role}">${roleInfo.label}</div>
+  </div>
+  <div class="desc-text" style="margin-bottom:8px">${node.desc}</div>`;
 
-  /* Push/Pull balance bar */
+  /* Stats row */
+  html += `<div class="ig-stats">
+    <div class="ig-stat"><div class="ig-val" style="color:var(--color-primary)">${impactScore}</div><div class="ig-lbl">Impact</div>
+      <div class="ig-wbar"><div class="ig-wbar-fill" style="width:${impactPct}%;background:var(--color-primary)"></div></div></div>
+    <div class="ig-stat"><div class="ig-val">${node.connections}</div><div class="ig-lbl">Links</div></div>
+    <div class="ig-stat"><div class="ig-val">${avgW}</div><div class="ig-lbl">Avg Str</div>
+      <div class="ig-wbar"><div class="ig-wbar-fill" style="width:${(avgW/5*100).toFixed(0)}%;background:var(--color-warning)"></div></div></div>
+  </div>`;
+
+  /* System effect bar — labeled */
   if (all.length > 0) {
     const total = all.length;
     const pushPct = (pushCount/total*100).toFixed(0);
     const pullPct = (pullCount/total*100).toFixed(0);
     const mixPct = (mixCount/total*100).toFixed(0);
-    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px">
-      <span style="color:var(--color-positive)">+${pushCount}</span>
-      <div style="flex:1;height:6px;border-radius:3px;display:flex;overflow:hidden;background:var(--color-surface-2)">
-        <div style="width:${pushPct}%;background:var(--color-positive)"></div>
-        <div style="width:${mixPct}%;background:var(--color-warning)"></div>
-        <div style="width:${pullPct}%;background:var(--color-negative)"></div>
+    html += `<div class="ig-sysbar">
+      <div class="ig-sysbar-label"><span class="green">↑ Reinforcing (improves)</span><span class="red">Degrading (stresses) ↓</span></div>
+      <div class="ig-sysbar-track">
+        <div class="ig-sysbar-seg" style="width:${pushPct}%;background:var(--color-positive)"></div>
+        <div class="ig-sysbar-seg" style="width:${mixPct}%;background:var(--color-warning)"></div>
+        <div class="ig-sysbar-seg" style="width:${pullPct}%;background:var(--color-negative)"></div>
       </div>
-      <span style="color:var(--color-negative)">−${pullCount}</span>
+      <div class="ig-sysbar-counts">
+        <span style="color:var(--color-positive)">${pushCount} reinforce</span>
+        ${mixCount ? `<span style="color:var(--color-warning)">${mixCount} mixed</span>` : ''}
+        <span style="color:var(--color-negative)">${pullCount} degrade</span>
+      </div>
     </div>`;
   }
 
   /* Key fact callout */
   html += `<div class="ig-fact"><div class="ig-fact-icon">💡</div><div><div class="ig-fact-text">${node.fact}</div><span class="ig-fact-src">${node.src}</span></div></div>`;
 
-  /* Coupling flows */
+  /* Coupling flows — with strength labels */
   const renderFlows = (title, edges, isOut) => {
     if (!edges.length) return '';
     let h = `<div class="panel-section"><h3>${title}</h3><div class="ig-flows">`;
     edges.forEach(e => {
       const other = NODES[idxMap[isOut ? e.t : e.s]];
       const ac = e.type === 'positive' ? 'push' : e.type === 'negative' ? 'pull' : 'mix';
-      const as = e.type === 'positive' ? '+' : e.type === 'negative' ? '−' : '±';
-      const barColor = e.type === 'positive' ? 'var(--color-positive)' : e.type === 'negative' ? 'var(--color-negative)' : 'var(--color-warning)';
+      const as = e.type === 'positive' ? '↑' : e.type === 'negative' ? '↓' : '⇅';
+      const sl = getStrengthLabel(e.type, e.w);
       h += `<div class="ig-flow" onclick="this.classList.toggle('expanded')">
         <div class="ig-flow-arrow ${ac}">${as}</div>
         <div class="ig-flow-name">${other.icon} ${other.label}</div>
-        <div class="ig-flow-bar"><div class="ig-flow-bar-fill" style="width:${e.w/5*100}%;background:${barColor}"></div></div>
+        <span class="ig-strength ${sl.cls}">${sl.text}</span>
         <div class="ig-flow-w">${e.w}/5</div>
         <div class="ig-flow-detail">${e.mech}<br><span class="source-tag">${e.cite}</span></div>
       </div>`;
@@ -1045,33 +1103,38 @@ function showNodePanel(node) {
     return h + '</div></div>';
   };
 
-  html += renderFlows('Outgoing', outgoing, true);
-  html += renderFlows('Incoming', incoming, false);
+  html += renderFlows('Outgoing — how this node affects others', outgoing, true);
+  html += renderFlows('Incoming — how others affect this node', incoming, false);
   panelBody.innerHTML = html;
   panelEl.classList.add('open');
 }
 
 function showEdgePanel(edge, si, ti) {
   const sn = NODES[si], tn = NODES[ti];
-  const typeLabel = { positive: 'PUSH', negative: 'PULL', mixed: 'MIXED' };
-  const typeColor = { positive: 'var(--color-positive)', negative: 'var(--color-negative)', mixed: 'var(--color-warning)' };
-  const arrowColor = typeColor[edge.type];
+  const typeExplain = {
+    positive: { label: 'REINFORCES', explain: 'Investment here strengthens the target system', color: 'var(--color-positive)' },
+    negative: { label: 'DEGRADES', explain: 'Stress here cascades into and weakens the target', color: 'var(--color-negative)' },
+    mixed:    { label: 'DOUBLE-EDGED', explain: 'Can strengthen or weaken depending on conditions', color: 'var(--color-warning)' }
+  };
+  const info = typeExplain[edge.type];
+  const sl = getStrengthLabel(edge.type, edge.w);
 
   panelTitle.textContent = `${sn.icon} → ${tn.icon}`;
   panelBody.innerHTML = `
     <div class="ig-edge-vis">
       <div class="ig-edge-node"><span class="ig-en-icon">${sn.icon}</span>${sn.label}</div>
       <div class="ig-edge-arrow">
-        <svg viewBox="0 0 40 16" fill="none"><path d="M0 8h32M28 3l6 5-6 5" stroke="${arrowColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span class="coupling-badge ${edge.type}">${typeLabel[edge.type]}</span>
+        <svg viewBox="0 0 40 16" fill="none"><path d="M0 8h32M28 3l6 5-6 5" stroke="${info.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="coupling-badge ${edge.type}">${info.label}</span>
       </div>
       <div class="ig-edge-node"><span class="ig-en-icon">${tn.icon}</span>${tn.label}</div>
     </div>
     <div style="text-align:center;margin-bottom:8px">
-      <div class="ig-edge-wt" style="color:${arrowColor}">${edge.w}<span style="font-size:14px;color:var(--color-text-faint)">/5</span></div>
-      <div class="ig-edge-wt-bar" style="margin:4px auto 0"><div class="ig-edge-wt-bar-fill" style="width:${edge.w/5*100}%;background:${arrowColor}"></div></div>
-      <div style="font-size:13px;color:var(--color-text-muted);margin-top:4px">Coupling Strength</div>
+      <div class="ig-edge-wt" style="color:${info.color}">${edge.w}<span style="font-size:14px;color:var(--color-text-faint)">/5</span></div>
+      <div class="ig-edge-wt-bar" style="margin:4px auto 0"><div class="ig-edge-wt-bar-fill" style="width:${edge.w/5*100}%;background:${info.color}"></div></div>
+      <div style="font-size:13px;color:var(--color-text-muted);margin-top:4px">Coupling Strength — <span class="ig-strength ${sl.cls}">${sl.text}</span></div>
     </div>
+    <div class="desc-text" style="text-align:center;margin-bottom:var(--space-2);font-style:italic">${info.explain}</div>
     <div class="ig-fact"><div class="ig-fact-icon">⚙️</div><div><div class="ig-fact-text" style="color:var(--color-text)">${edge.mech}</div><span class="ig-fact-src">${edge.cite}</span></div></div>`;
   panelEl.classList.add('open');
 }
