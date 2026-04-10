@@ -339,6 +339,24 @@ main{position:relative;overflow:hidden}
 .info-card .cta{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);background:var(--color-primary);color:#fff;border-radius:var(--radius-sm);font-size:var(--text-sm);font-weight:600;transition:background var(--transition)}
 .info-card .cta:hover{background:var(--color-primary-hover)}
 
+/* ═══════════════════ MOBILE ZOOM BAR ═══════════════════ */
+.zoom-bar{display:none}
+@media(max-width:768px){
+  .zoom-bar{display:flex;flex-direction:column;align-items:center;gap:6px;position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:130;padding:6px 4px;border-radius:20px;background:rgba(19,25,32,0.75);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,0.4);touch-action:none}
+  [data-theme="light"] .zoom-bar{background:rgba(255,255,255,0.8);border-color:rgba(0,0,0,0.08);box-shadow:0 4px 16px rgba(0,0,0,0.12)}
+  .zoom-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:rgba(255,255,255,0.7);background:transparent;cursor:pointer;transition:background 150ms,color 150ms;flex-shrink:0}
+  .zoom-icon svg{width:18px;height:18px}
+  .zoom-icon:active{background:rgba(79,152,163,0.3);color:#fff;transform:scale(0.9)}
+  [data-theme="light"] .zoom-icon{color:rgba(0,0,0,0.5)}
+  [data-theme="light"] .zoom-icon:active{color:rgba(0,0,0,0.9)}
+  .zoom-track{width:6px;height:140px;background:rgba(255,255,255,0.1);border-radius:3px;position:relative;cursor:pointer;touch-action:none}
+  [data-theme="light"] .zoom-track{background:rgba(0,0,0,0.08)}
+  .zoom-fill{position:absolute;bottom:0;left:0;width:100%;border-radius:3px;background:var(--color-primary);opacity:0.6;pointer-events:none;transition:height 60ms}
+  .zoom-thumb{position:absolute;left:50%;width:18px;height:18px;border-radius:50%;background:var(--color-primary);border:2px solid rgba(255,255,255,0.9);transform:translate(-50%,-50%);cursor:grab;touch-action:none;box-shadow:0 2px 8px rgba(0,0,0,0.4);transition:transform 60ms}
+  .zoom-thumb:active{cursor:grabbing;transform:translate(-50%,-50%) scale(1.2)}
+  [data-theme="light"] .zoom-thumb{border-color:rgba(255,255,255,1);box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+}
+
 /* ═══════════════════ FULLSCREEN TOGGLE ═══════════════════ */
 .fs-btn{position:absolute;bottom:calc(var(--space-3) + env(safe-area-inset-bottom, 0px));right:var(--space-3);z-index:120;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-muted);cursor:pointer;box-shadow:var(--shadow-md);transition:background 180ms var(--ease-out),color 180ms,transform 120ms}
 .fs-btn:hover{background:var(--color-surface-2);color:var(--color-text);transform:scale(1.08)}
@@ -513,6 +531,15 @@ main{position:relative;overflow:hidden}
       </div>
     </div>
   </main>
+  <!-- Mobile zoom bar -->
+  <div id="zoom-bar" class="zoom-bar">
+    <button class="zoom-icon zoom-in" id="zoom-in-btn" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+    <div class="zoom-track" id="zoom-track">
+      <div class="zoom-fill" id="zoom-fill"></div>
+      <div class="zoom-thumb" id="zoom-thumb"></div>
+    </div>
+    <button class="zoom-icon zoom-out" id="zoom-out-btn" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+  </div>
   <button id="btn-fullscreen" class="fs-btn" aria-label="Toggle fullscreen" title="Toggle fullscreen">
     <svg class="fs-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
     <svg class="fs-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
@@ -2045,6 +2072,122 @@ function animate() {
   updateLabels();
 }
 animate();
+
+/* ═══════════════════════════════════════════════
+   MOBILE ZOOM BAR CONTROLLER
+   ═══════════════════════════════════════════════ */
+if (isMobile) {
+  const zoomBar = document.getElementById('zoom-bar');
+  const zoomTrack = document.getElementById('zoom-track');
+  const zoomThumb = document.getElementById('zoom-thumb');
+  const zoomFill = document.getElementById('zoom-fill');
+  const zoomInBtn = document.getElementById('zoom-in-btn');
+  const zoomOutBtn = document.getElementById('zoom-out-btn');
+
+  // Map camera distance to 0..1 (0 = closest / zoomed in, 1 = farthest / zoomed out)
+  function distToRatio() {
+    const dist = camera.position.distanceTo(controls.target);
+    const lo = controls.minDistance, hi = controls.maxDistance;
+    return Math.max(0, Math.min(1, (dist - lo) / (hi - lo)));
+  }
+
+  function setZoomFromRatio(r) {
+    r = Math.max(0, Math.min(1, r));
+    const lo = controls.minDistance, hi = controls.maxDistance;
+    const targetDist = lo + r * (hi - lo);
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(dir, targetDist);
+    controls.update();
+  }
+
+  // Update thumb/fill position from camera state
+  function syncZoomUI() {
+    const r = distToRatio();
+    // r=0 means zoomed in (thumb at top), r=1 means zoomed out (thumb at bottom)
+    const trackH = zoomTrack.offsetHeight;
+    const pxFromTop = r * trackH;
+    zoomThumb.style.top = pxFromTop + 'px';
+    zoomFill.style.height = ((1 - r) * 100) + '%';
+  }
+
+  // Sync on every frame
+  const _origAnimate = animate;
+  // Hook into the animation loop via controls change event
+  controls.addEventListener('change', syncZoomUI);
+  // Also sync on init
+  requestAnimationFrame(syncZoomUI);
+
+  // Touch drag on the track/thumb
+  let isDragging = false;
+  function handleTrackTouch(clientY) {
+    const rect = zoomTrack.getBoundingClientRect();
+    const y = clientY - rect.top;
+    const r = Math.max(0, Math.min(1, y / rect.height));
+    setZoomFromRatio(r);
+    syncZoomUI();
+  }
+
+  zoomTrack.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    isDragging = true;
+    zoomTrack.setPointerCapture(e.pointerId);
+    handleTrackTouch(e.clientY);
+  });
+  zoomTrack.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); e.stopPropagation();
+    handleTrackTouch(e.clientY);
+  });
+  zoomTrack.addEventListener('pointerup', (e) => {
+    isDragging = false;
+    e.stopPropagation();
+  });
+  zoomTrack.addEventListener('pointercancel', () => { isDragging = false; });
+
+  zoomThumb.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    isDragging = true;
+    zoomThumb.setPointerCapture(e.pointerId);
+  });
+  zoomThumb.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault(); e.stopPropagation();
+    handleTrackTouch(e.clientY);
+  });
+  zoomThumb.addEventListener('pointerup', (e) => {
+    isDragging = false;
+    e.stopPropagation();
+  });
+  zoomThumb.addEventListener('pointercancel', () => { isDragging = false; });
+
+  // + / - buttons: step zoom by 15%
+  const ZOOM_STEP = 0.12;
+  let zoomInterval = null;
+  function startZoomRepeat(dir) {
+    const step = () => {
+      setZoomFromRatio(distToRatio() + dir * ZOOM_STEP);
+      syncZoomUI();
+    };
+    step();
+    zoomInterval = setInterval(step, 150);
+  }
+  function stopZoomRepeat() { clearInterval(zoomInterval); zoomInterval = null; }
+
+  zoomInBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); startZoomRepeat(-1); });
+  zoomInBtn.addEventListener('pointerup', (e) => { e.stopPropagation(); stopZoomRepeat(); });
+  zoomInBtn.addEventListener('pointerleave', stopZoomRepeat);
+  zoomInBtn.addEventListener('pointercancel', stopZoomRepeat);
+
+  zoomOutBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); startZoomRepeat(1); });
+  zoomOutBtn.addEventListener('pointerup', (e) => { e.stopPropagation(); stopZoomRepeat(); });
+  zoomOutBtn.addEventListener('pointerleave', stopZoomRepeat);
+  zoomOutBtn.addEventListener('pointercancel', stopZoomRepeat);
+
+  // Isolate zoom bar touches from OrbitControls
+  zoomBar.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+  zoomBar.addEventListener('touchmove', (e) => { e.stopPropagation(); e.preventDefault(); }, { passive: false });
+  zoomBar.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
+}
 
 /* ═══════════════════════════════════════════════
    EVENT WIRING
