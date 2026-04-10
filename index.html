@@ -83,7 +83,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:var
 
 /* MAIN / CANVAS */
 main{position:relative;overflow:hidden}
-#three-canvas{width:100%;height:100%;display:block;outline:none;position:relative;z-index:1;touch-action:none}
+#three-canvas{width:100%;height:100%;display:block;outline:none;position:relative;z-index:1;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 
 /* ═══════════════════ HOVER LABEL ═══════════════════ */
 #hover-label{
@@ -619,15 +619,53 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
 camera.position.set(0, 0, 110);
 
+const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.dampingFactor = 0.12;
+controls.dampingFactor = isMobile ? 0.18 : 0.12;
 controls.minDistance = 20;
 controls.maxDistance = 300;
 controls.enablePan = true;
-controls.zoomSpeed = 1.5;
-controls.rotateSpeed = 0.8;
+controls.panSpeed = isMobile ? 0.7 : 0.8;
+controls.zoomSpeed = isMobile ? 1.2 : 1.5;
+controls.rotateSpeed = isMobile ? 1.0 : 0.8;
 controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+
+/* ── iOS Safari gesture fixes ── */
+// Prevent Safari's native pinch-to-zoom page gesture from stealing touch events
+canvas.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('gestureend', e => e.preventDefault(), { passive: false });
+
+// iOS Safari drops pointerup events under load, leaving stale pointers
+// that make OrbitControls think a finger is still down. Detect via
+// touchend and force a synthetic pointerup if needed.
+(function patchIOSPointerLoss() {
+  if (!isMobile) return;
+  const activePointers = new Map(); // pointerId → true
+  canvas.addEventListener('pointerdown', e => activePointers.set(e.pointerId, true), true);
+  canvas.addEventListener('pointerup', e => activePointers.delete(e.pointerId), true);
+  canvas.addEventListener('pointercancel', e => activePointers.delete(e.pointerId), true);
+  canvas.addEventListener('touchend', () => {
+    // After a touchend, if any pointers are still "active" after a short delay, force cleanup
+    setTimeout(() => {
+      if (activePointers.size > 0) {
+        activePointers.forEach((_, pid) => {
+          canvas.dispatchEvent(new PointerEvent('pointerup', {
+            pointerId: pid, bubbles: true, cancelable: true
+          }));
+        });
+        activePointers.clear();
+      }
+    }, 80);
+  }, { passive: true });
+  // Also handle pointercancel (iOS fires this on interrupted gestures)
+  canvas.addEventListener('pointercancel', (e) => {
+    canvas.dispatchEvent(new PointerEvent('pointerup', {
+      pointerId: e.pointerId, bubbles: true, cancelable: true
+    }));
+  });
+})();
 
 // Hide orbit hint after first interaction
 let hintShown = true;
@@ -712,14 +750,26 @@ document.querySelector('main').appendChild(labelContainer);
 
 const labelEls = NODES.map((n, i) => {
   const el = document.createElement('div');
-  el.style.cssText = `position:absolute;font:500 13px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms`;
-  /* Tap-vs-drag: only open panel on genuine taps, not drag/rotate starts */
-  let _px, _py, _pt;
+  el.style.cssText = `position:absolute;font:500 13px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none`;
+  /* Tap-vs-drag: only open panel on genuine taps, not drag/rotate starts.
+     On mobile, labels use pointer-events:none during active touches so
+     OrbitControls handles rotation/zoom directly on canvas. Taps are
+     detected via pointerdown/up timing. */
+  let _px, _py, _pt, _pid;
   el.addEventListener('pointerdown', (ev) => {
-    _px = ev.clientX; _py = ev.clientY; _pt = performance.now();
+    _px = ev.clientX; _py = ev.clientY; _pt = performance.now(); _pid = ev.pointerId;
+    el.setPointerCapture(ev.pointerId); // ensure we get pointerup for tap detection
+  });
+  el.addEventListener('pointermove', (ev) => {
+    // If drag exceeds tap threshold, release capture so OrbitControls can rotate/pan
+    if (_pid != null && (Math.hypot(ev.clientX - _px, ev.clientY - _py) > 10)) {
+      try { el.releasePointerCapture(_pid); } catch(e) {}
+      _pid = null;
+    }
   });
   el.addEventListener('pointerup', (ev) => {
     const dx = ev.clientX - _px, dy = ev.clientY - _py;
+    _pid = null;
     if (Math.hypot(dx, dy) < 10 && performance.now() - _pt < 350) {
       ev.stopPropagation();
       showNodePanel(n);
@@ -729,6 +779,7 @@ const labelEls = NODES.map((n, i) => {
       document.getElementById('hover-label').classList.remove('visible');
     }
   });
+  el.addEventListener('lostpointercapture', () => { _pid = null; });
   el.textContent = `${n.icon} ${n.label}`;
   labelContainer.appendChild(el);
   return el;
