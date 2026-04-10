@@ -77,7 +77,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:var
 .logo-group h1{font-size:var(--text-sm);font-weight:600;letter-spacing:-0.01em;white-space:nowrap}
 .logo-group h1 span{color:var(--color-text-muted);font-weight:400;margin-left:var(--space-2)}
 .header-controls{display:flex;align-items:center;gap:var(--space-1)}
-.header-btn{display:inline-flex;align-items:center;gap:var(--space-1);padding:3px 10px;font-size:12px;font-weight:500;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface-2);color:var(--color-text-muted);transition:background var(--transition),color var(--transition),border-color var(--transition)}
+.header-btn{display:inline-flex;align-items:center;gap:var(--space-1);padding:4px 12px;font-size:14px;font-weight:500;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface-2);color:var(--color-text-muted);transition:background var(--transition),color var(--transition),border-color var(--transition)}
 .header-btn:hover{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
 .header-btn.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
 
@@ -90,36 +90,36 @@ main{position:relative;overflow:hidden}
   position:absolute;pointer-events:none;z-index:200;
   background:var(--color-surface);border:1px solid var(--color-border);
   border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);
-  box-shadow:var(--shadow-md);font-size:12px;line-height:1.5;
+  box-shadow:var(--shadow-md);font-size:14px;line-height:1.5;
   max-width:300px;opacity:0;transition:opacity 120ms var(--ease-out);
   white-space:nowrap;
 }
 #hover-label.visible{opacity:1}
-#hover-label h4{font-weight:600;font-size:13px;margin-bottom:2px}
-#hover-label .hl-sub{color:var(--color-text-muted);font-size:11px}
-.coupling-badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 5px;border-radius:var(--radius-sm);text-transform:uppercase;letter-spacing:0.04em}
+#hover-label h4{font-weight:600;font-size:15px;margin-bottom:2px}
+#hover-label .hl-sub{color:var(--color-text-muted);font-size:13px}
+.coupling-badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 6px;border-radius:var(--radius-sm);text-transform:uppercase;letter-spacing:0.04em}
 .coupling-badge.positive{background:rgba(63,185,80,0.15);color:var(--color-positive)}
 .coupling-badge.negative{background:rgba(248,81,73,0.15);color:var(--color-negative)}
 .coupling-badge.mixed{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 
 /* ═══════════════════ DETAIL PANEL ═══════════════════ */
-#detail-panel{position:absolute;top:0;right:0;width:340px;max-width:92vw;height:100%;background:var(--color-surface);border-left:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform 300ms var(--ease-out);z-index:150;display:flex;flex-direction:column;overflow:hidden}
+#detail-panel{position:absolute;top:0;right:0;width:380px;max-width:92vw;height:100%;background:var(--color-surface);border-left:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform 300ms var(--ease-out);z-index:150;display:flex;flex-direction:column;overflow:hidden}
 #detail-panel.open{transform:translateX(0)}
 .panel-header{display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-border);flex-shrink:0}
-.panel-header h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:var(--space-1)}
-.panel-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);font-size:16px;color:var(--color-text-muted);transition:background var(--transition)}
+.panel-header h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:var(--space-1)}
+.panel-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);font-size:18px;color:var(--color-text-muted);transition:background var(--transition)}
 .panel-close:hover{background:var(--color-surface-2);color:var(--color-text)}
 .panel-body{flex:1;overflow-y:auto;padding:var(--space-2) var(--space-3)}
 .panel-body::-webkit-scrollbar{width:4px}
 .panel-body::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
 .panel-section{margin-bottom:var(--space-3)}
-.panel-section h3{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);margin-bottom:var(--space-1)}
+.panel-section h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);margin-bottom:var(--space-1)}
 
 /* ── Infographic Stats Row ── */
 .ig-stats{display:flex;gap:6px;margin-bottom:var(--space-2)}
 .ig-stat{flex:1;background:var(--color-surface-2);border-radius:var(--radius-sm);padding:6px 8px;text-align:center;position:relative;overflow:hidden}
-.ig-stat .ig-val{font-family:var(--font-mono);font-size:18px;font-weight:700;line-height:1.2}
-.ig-stat .ig-lbl{font-size:9px;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
+.ig-stat .ig-val{font-family:var(--font-mono);font-size:22px;font-weight:700;line-height:1.2}
+.ig-stat .ig-lbl{font-size:11px;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
 
 /* ── Weight bar (horizontal) ── */
 .ig-wbar{height:4px;border-radius:2px;background:var(--color-surface-2);margin-top:4px;overflow:hidden}
@@ -127,62 +127,62 @@ main{position:relative;overflow:hidden}
 
 /* ── Key fact callout ── */
 .ig-fact{display:flex;gap:8px;align-items:flex-start;background:var(--color-surface-2);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:var(--space-2);border-left:3px solid var(--color-primary)}
-.ig-fact-icon{font-size:16px;flex-shrink:0;line-height:1.2}
-.ig-fact-text{font-size:12px;font-weight:600;color:var(--color-primary);line-height:1.35}
-.ig-fact-src{font-size:9px;color:var(--color-text-faint);font-weight:400;display:block;margin-top:2px}
+.ig-fact-icon{font-size:20px;flex-shrink:0;line-height:1.2}
+.ig-fact-text{font-size:15px;font-weight:600;color:var(--color-primary);line-height:1.35}
+.ig-fact-src{font-size:11px;color:var(--color-text-faint);font-weight:400;display:block;margin-top:2px}
 
 /* ── TL;DR badge ── */
-.ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.04em}
+.ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:12px;font-weight:600;padding:3px 10px;border-radius:10px;margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.04em}
 
 /* ── Coupling flow chips ── */
 .ig-flows{display:flex;flex-direction:column;gap:4px}
-.ig-flow{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--color-surface-2);border-radius:var(--radius-sm);font-size:11px;cursor:pointer;transition:background 120ms;flex-wrap:wrap}
+.ig-flow{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--color-surface-2);border-radius:var(--radius-sm);font-size:14px;cursor:pointer;transition:background 120ms;flex-wrap:wrap}
 .ig-flow:hover{background:var(--color-border)}
-.ig-flow-arrow{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.ig-flow-arrow{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .ig-flow-arrow.push{background:rgba(63,185,80,0.18);color:var(--color-positive)}
 .ig-flow-arrow.pull{background:rgba(248,81,73,0.18);color:var(--color-negative)}
 .ig-flow-arrow.mix{background:rgba(210,153,34,0.18);color:var(--color-warning)}
 .ig-flow-name{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ig-flow-w{font-family:var(--font-mono);font-size:10px;color:var(--color-text-faint);flex-shrink:0}
-.ig-flow-bar{width:40px;height:4px;border-radius:2px;background:var(--color-surface);flex-shrink:0;overflow:hidden}
+.ig-flow-w{font-family:var(--font-mono);font-size:13px;color:var(--color-text-faint);flex-shrink:0}
+.ig-flow-bar{width:48px;height:5px;border-radius:2px;background:var(--color-surface);flex-shrink:0;overflow:hidden}
 .ig-flow-bar-fill{height:100%;border-radius:2px}
 
 /* ── Coupling detail (expanded) ── */
-.ig-flow-detail{font-size:10px;color:var(--color-text-muted);line-height:1.4;padding:3px 0 0 24px;display:none;width:100%;flex-basis:100%}
+.ig-flow-detail{font-size:13px;color:var(--color-text-muted);line-height:1.45;padding:4px 0 0 30px;display:none;width:100%;flex-basis:100%}
 .ig-flow.expanded .ig-flow-detail{display:block}
 
 /* ── Edge panel visual ── */
 .ig-edge-vis{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;margin-bottom:var(--space-2)}
-.ig-edge-node{text-align:center;font-size:11px;font-weight:600}
-.ig-edge-node .ig-en-icon{font-size:20px;display:block;margin-bottom:2px}
+.ig-edge-node{text-align:center;font-size:14px;font-weight:600}
+.ig-edge-node .ig-en-icon{font-size:24px;display:block;margin-bottom:2px}
 .ig-edge-arrow{display:flex;flex-direction:column;align-items:center;gap:2px}
 .ig-edge-arrow svg{width:40px;height:16px}
-.ig-edge-wt{font-family:var(--font-mono);font-size:18px;font-weight:700}
+.ig-edge-wt{font-family:var(--font-mono);font-size:22px;font-weight:700}
 .ig-edge-wt-bar{width:80px;height:6px;border-radius:3px;background:var(--color-surface-2);overflow:hidden}
 .ig-edge-wt-bar-fill{height:100%;border-radius:3px}
 
 /* ── Desc text ── */
-.desc-text{font-size:11px;color:var(--color-text-muted);line-height:1.5}
-.source-tag{font-size:9px;color:var(--color-primary);display:inline-block;margin-top:2px}
-.coupling-badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 5px;border-radius:var(--radius-sm);text-transform:uppercase;letter-spacing:0.04em}
+.desc-text{font-size:14px;color:var(--color-text-muted);line-height:1.5}
+.source-tag{font-size:11px;color:var(--color-primary);display:inline-block;margin-top:2px}
+.coupling-badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 6px;border-radius:var(--radius-sm);text-transform:uppercase;letter-spacing:0.04em}
 .coupling-badge.positive{background:rgba(63,185,80,0.15);color:var(--color-positive)}
 .coupling-badge.negative{background:rgba(248,81,73,0.15);color:var(--color-negative)}
 .coupling-badge.mixed{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 
 /* ═══════════════════ FOCUS MODE ═══════════════════ */
-.focused-label{font-size:14px!important;font-weight:700!important;text-shadow:0 2px 8px var(--color-bg),0 0 16px var(--color-bg),0 0 32px var(--color-bg)!important}
-#focus-back{position:absolute;top:calc(var(--space-4) + 44px);left:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-1) var(--space-3);font-size:12px;font-weight:500;color:var(--color-text-muted);cursor:pointer;z-index:120;opacity:0;pointer-events:none;transition:opacity 300ms var(--ease-out),background 180ms;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:var(--space-1)}
+.focused-label{font-size:17px!important;font-weight:700!important;text-shadow:0 2px 8px var(--color-bg),0 0 16px var(--color-bg),0 0 32px var(--color-bg)!important}
+#focus-back{position:absolute;top:calc(var(--space-4) + 44px);left:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-1) var(--space-3);font-size:14px;font-weight:500;color:var(--color-text-muted);cursor:pointer;z-index:120;opacity:0;pointer-events:none;transition:opacity 300ms var(--ease-out),background 180ms;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:var(--space-1)}
 #focus-back.visible{opacity:1;pointer-events:auto}
 #focus-back:hover{background:var(--color-surface-2);color:var(--color-text)}
 
 /* ═══════════════════ SCENARIO BAR ═══════════════════ */
 #scenario-bar{position:absolute;bottom:var(--space-3);left:50%;transform:translateX(-50%);display:flex;gap:var(--space-1);padding:var(--space-1) var(--space-2);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);z-index:100;max-width:calc(100vw - 1.5rem);overflow-x:auto}
-.scenario-btn{white-space:nowrap;padding:var(--space-1) var(--space-2);font-size:12px;font-weight:500;border-radius:var(--radius-sm);border:1px solid transparent;color:var(--color-text-muted);transition:background var(--transition),color var(--transition)}
+.scenario-btn{white-space:nowrap;padding:var(--space-1) var(--space-2);font-size:14px;font-weight:500;border-radius:var(--radius-sm);border:1px solid transparent;color:var(--color-text-muted);transition:background var(--transition),color var(--transition)}
 .scenario-btn:hover{background:var(--color-surface-2);color:var(--color-text)}
 .scenario-btn.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
 
 /* ═══════════════════ LEGEND ═══════════════════ */
-#legend{position:absolute;bottom:56px;left:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);font-size:10px;box-shadow:var(--shadow-md);z-index:100;line-height:1.8}
+#legend{position:absolute;bottom:56px;left:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);font-size:12px;box-shadow:var(--shadow-md);z-index:100;line-height:1.8}
 .legend-row{display:flex;align-items:center;gap:var(--space-2)}
 .legend-line{width:20px;height:2px;border-radius:1px}
 
@@ -205,11 +205,13 @@ main{position:relative;overflow:hidden}
 @media(max-width:768px){
   header{padding:var(--space-1) var(--space-2);gap:var(--space-2)}
   .logo-group h1 span{display:none}
-  .logo-group h1{font-size:13px}
-  .header-btn{padding:2px 6px;font-size:11px}
-  .scenario-btn{padding:var(--space-1) 6px;font-size:11px}
+  .logo-group h1{font-size:0.85rem}
+  .header-btn{padding:3px 8px;font-size:0.8rem}
+  .scenario-btn{padding:var(--space-1) 6px;font-size:0.8rem}
   #scenario-bar{gap:2px}
   #legend{display:none}
+  #focus-back{font-size:0.85rem}
+  .focused-label{font-size:1.05rem!important}
   /* Bottom sheet panel */
   #detail-panel{
     top:auto;bottom:0;left:0;right:0;
@@ -225,15 +227,29 @@ main{position:relative;overflow:hidden}
   .panel-header{padding:var(--space-1) var(--space-3)}
   .panel-header::before{content:'';display:block;width:32px;height:4px;border-radius:2px;background:var(--color-border);position:absolute;top:6px;left:50%;transform:translateX(-50%)}
   .panel-header{padding-top:14px;position:relative}
-  .panel-header h2{font-size:14px}
+  .panel-header h2{font-size:1.05rem}
+  .panel-close{width:2rem;height:2rem;font-size:1.05rem}
   .panel-body{padding:var(--space-1) var(--space-3) var(--space-2)}
+  .panel-section h3{font-size:0.75rem}
+  .ig-tldr{font-size:0.75rem;padding:3px 10px}
+  .desc-text{font-size:0.85rem}
   .ig-stats{gap:4px}
-  .ig-stat{padding:4px 6px}
-  .ig-stat .ig-val{font-size:15px}
-  .ig-fact{padding:6px 8px}
-  .ig-fact-text{font-size:11px}
-  .ig-flow{padding:4px 6px;font-size:10px}
-  .ig-flow-arrow{width:16px;height:16px;font-size:9px}
+  .ig-stat{padding:6px 8px}
+  .ig-stat .ig-val{font-size:1.15rem}
+  .ig-stat .ig-lbl{font-size:0.65rem}
+  .ig-fact{padding:8px 10px}
+  .ig-fact-text{font-size:0.85rem}
+  .ig-fact-src{font-size:0.65rem}
+  .ig-flow{padding:6px 8px;gap:6px;font-size:0.85rem}
+  .ig-flow-arrow{width:1.25rem;height:1.25rem;font-size:0.7rem}
+  .ig-flow-w{font-size:0.75rem}
+  .ig-flow-detail{font-size:0.8rem;padding-left:1.6rem}
+  .ig-flow-bar{width:2rem}
+  .ig-edge-node{font-size:0.85rem}
+  .ig-edge-node .ig-en-icon{font-size:1.3rem}
+  .ig-edge-wt{font-size:1.15rem}
+  .coupling-badge{font-size:0.7rem}
+  .source-tag{font-size:0.65rem}
   .panel-section{margin-bottom:var(--space-2)}
 }
 :focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--radius-sm)}
@@ -648,7 +664,7 @@ document.querySelector('main').appendChild(labelContainer);
 
 const labelEls = NODES.map((n, i) => {
   const el = document.createElement('div');
-  el.style.cssText = `position:absolute;font:500 11px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms`;
+  el.style.cssText = `position:absolute;font:500 13px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms`;
   el.addEventListener('click', (ev) => {
     ev.stopPropagation();
     showNodePanel(n);
@@ -995,7 +1011,7 @@ function showNodePanel(node) {
     const pushPct = (pushCount/total*100).toFixed(0);
     const pullPct = (pullCount/total*100).toFixed(0);
     const mixPct = (mixCount/total*100).toFixed(0);
-    html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:10px">
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px">
       <span style="color:var(--color-positive)">+${pushCount}</span>
       <div style="flex:1;height:6px;border-radius:3px;display:flex;overflow:hidden;background:var(--color-surface-2)">
         <div style="width:${pushPct}%;background:var(--color-positive)"></div>
@@ -1052,9 +1068,9 @@ function showEdgePanel(edge, si, ti) {
       <div class="ig-edge-node"><span class="ig-en-icon">${tn.icon}</span>${tn.label}</div>
     </div>
     <div style="text-align:center;margin-bottom:8px">
-      <div class="ig-edge-wt" style="color:${arrowColor}">${edge.w}<span style="font-size:12px;color:var(--color-text-faint)">/5</span></div>
+      <div class="ig-edge-wt" style="color:${arrowColor}">${edge.w}<span style="font-size:14px;color:var(--color-text-faint)">/5</span></div>
       <div class="ig-edge-wt-bar" style="margin:4px auto 0"><div class="ig-edge-wt-bar-fill" style="width:${edge.w/5*100}%;background:${arrowColor}"></div></div>
-      <div style="font-size:10px;color:var(--color-text-muted);margin-top:4px">Coupling Strength</div>
+      <div style="font-size:13px;color:var(--color-text-muted);margin-top:4px">Coupling Strength</div>
     </div>
     <div class="ig-fact"><div class="ig-fact-icon">⚙️</div><div><div class="ig-fact-text" style="color:var(--color-text)">${edge.mech}</div><span class="ig-fact-src">${edge.cite}</span></div></div>`;
   panelEl.classList.add('open');
