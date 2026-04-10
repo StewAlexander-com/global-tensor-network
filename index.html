@@ -762,7 +762,7 @@ const CausticShader = {
   `
 };
 const causticPass = new ShaderPass(CausticShader);
-causticPass.uniforms.uIntensity.value = 0.045;
+causticPass.uniforms.uIntensity.value = 0.035;
 composer.addPass(causticPass);
 
 /* ── God-Ray Radial Scatter ──
@@ -808,6 +808,8 @@ const GodRayShader = {
   `
 };
 const godRayPass = new ShaderPass(GodRayShader);
+godRayPass.uniforms.uExposure.value = 0.10;
+godRayPass.uniforms.uWeight.value = 0.06;
 composer.addPass(godRayPass);
 
 const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -883,8 +885,9 @@ function updateBg() {
     if (obj.userData.isStarField || obj.userData.isNebula) obj.visible = isDark;
   });
   // Caustic + god ray intensity per theme
-  causticPass.uniforms.uIntensity.value = isDark ? 0.045 : 0.012;
-  godRayPass.uniforms.uExposure.value = isDark ? 0.18 : 0.04;
+  causticPass.uniforms.uIntensity.value = isDark ? 0.035 : 0.012;
+  godRayPass.uniforms.uExposure.value = isDark ? 0.10 : 0.03;
+  godRayPass.uniforms.uWeight.value = isDark ? 0.06 : 0.03;
   // Adjust lighting for theme
   renderer.toneMappingExposure = isDark ? 1.1 : 1.4;
 }
@@ -1174,23 +1177,45 @@ NODES.forEach((n, i) => {
   nodeGroup.add(mesh);
   nodeMeshes.push(mesh);
 
-  // Primary glow halo sprite
+  // Primary glow halo sprite — size scales with connection count for "broad impact" feel
+  const isHighImpact = n.connections >= 10; // Energy Density = 12 connections
+  const haloOpacity = isHighImpact ? 0.5 : 0.35;
   const spriteMat = new THREE.SpriteMaterial({
     map: glowTexture,
     color: col,
     transparent: true,
-    opacity: 0.35,
+    opacity: haloOpacity,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     fog: true
   });
   const sprite = new THREE.Sprite(spriteMat);
-  const haloSize = (r + 1.5) * 3.5;
+  const haloSize = isHighImpact ? (r + 3) * 5.5 : (r + 1.5) * 3.5;
   sprite.scale.set(haloSize, haloSize, 1);
   sprite.position.copy(positions3D[i]);
   sprite.userData = { isHalo: true, parentIdx: i };
   nodeGroup.add(sprite);
   n._halo = sprite;
+
+  // Extra soft outer radial glow for high-impact nodes
+  if (isHighImpact) {
+    const outerMat = new THREE.SpriteMaterial({
+      map: glowTexture,
+      color: col,
+      transparent: true,
+      opacity: 0.12,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: true
+    });
+    const outerGlow = new THREE.Sprite(outerMat);
+    const outerSize = (r + 5) * 7;
+    outerGlow.scale.set(outerSize, outerSize, 1);
+    outerGlow.position.copy(positions3D[i]);
+    outerGlow.userData = { isOuterGlow: true, parentIdx: i };
+    nodeGroup.add(outerGlow);
+    n._outerGlow = outerGlow;
+  }
 
   // Chromatic dispersion ring — prismatic rainbow fringe around node
   const dispSprite = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -1410,10 +1435,15 @@ function resetHighlights() {
     m.material.opacity = 1;
     m.material.transparent = false;
     NODES[i]._ring.material.opacity = 0.1;
-    // Reset halo + dispersion
+    // Reset halo + dispersion + outer glow
+    const isHI = NODES[i].connections >= 10;
     if (NODES[i]._halo) {
-      NODES[i]._halo.material.opacity = 0.35;
+      NODES[i]._halo.material.opacity = isHI ? 0.5 : 0.35;
       NODES[i]._halo.material.color.set(col);
+    }
+    if (NODES[i]._outerGlow) {
+      NODES[i]._outerGlow.material.opacity = 0.12;
+      NODES[i]._outerGlow.material.color.set(col);
     }
     if (NODES[i]._dispersion) {
       NODES[i]._dispersion.material.opacity = 0.2;
@@ -1456,7 +1486,11 @@ function highlightNode(nodeId) {
     NODES[i]._ring.material.opacity = isFocus ? 0.5 : vis ? 0.2 : 0.02;
     // Halo: bright for focused, dim for others
     if (NODES[i]._halo) {
-      NODES[i]._halo.material.opacity = isFocus ? 0.7 : vis ? 0.2 : 0.02;
+      NODES[i]._halo.material.opacity = isFocus ? 0.8 : vis ? 0.2 : 0.02;
+    }
+    // Outer glow: prominent on focused high-impact node
+    if (NODES[i]._outerGlow) {
+      NODES[i]._outerGlow.material.opacity = isFocus ? 0.2 : vis ? 0.06 : 0.0;
     }
     // Dispersion: visible on focused, subtle on connected
     if (NODES[i]._dispersion) {
@@ -1578,6 +1612,7 @@ function applyScenario(id) {
     m.material.emissiveIntensity = involved ? 1.0 : 0.1;
     NODES[i]._ring.material.opacity = involved ? 0.4 : 0.02;
     if (NODES[i]._halo) NODES[i]._halo.material.opacity = involved ? 0.45 : 0.02;
+    if (NODES[i]._outerGlow) NODES[i]._outerGlow.material.opacity = involved ? 0.1 : 0.0;
     if (NODES[i]._dispersion) NODES[i]._dispersion.material.opacity = involved ? 0.25 : 0.01;
 
     if (sc.stressed.includes(nid)) {
@@ -1585,11 +1620,13 @@ function applyScenario(id) {
       m.material.emissive.set(0xf85149);
       NODES[i]._ring.material.color.set(0xf85149);
       if (NODES[i]._halo) NODES[i]._halo.material.color.set(0xf85149);
+      if (NODES[i]._outerGlow) NODES[i]._outerGlow.material.color.set(0xf85149);
     } else if (sc.improved.includes(nid)) {
       m.material.color.set(0x3fb950);
       m.material.emissive.set(0x3fb950);
       NODES[i]._ring.material.color.set(0x3fb950);
       if (NODES[i]._halo) NODES[i]._halo.material.color.set(0x3fb950);
+      if (NODES[i]._outerGlow) NODES[i]._outerGlow.material.color.set(0x3fb950);
     }
   });
 
@@ -1855,6 +1892,13 @@ function animate() {
       if (!n._halo.userData._baseOpacity) n._halo.userData._baseOpacity = baseOpacity;
       const pulse = 1 + 0.15 * Math.sin(_time * 1.2 + i * 1.7);
       n._halo.material.opacity = baseOpacity * pulse;
+    }
+    // Pulse outer glow in sync but slower
+    if (n._outerGlow && n._outerGlow.material.opacity > 0.01) {
+      const outerBase = n._outerGlow.userData._baseOpacity || n._outerGlow.material.opacity;
+      if (!n._outerGlow.userData._baseOpacity) n._outerGlow.userData._baseOpacity = outerBase;
+      const outerPulse = 1 + 0.1 * Math.sin(_time * 0.8 + i * 2.1);
+      n._outerGlow.material.opacity = outerBase * outerPulse;
     }
     // Slowly rotate dispersion ring for shimmering prismatic effect
     if (n._dispersion) {
