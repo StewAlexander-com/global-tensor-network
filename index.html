@@ -339,8 +339,19 @@ main{position:relative;overflow:hidden}
 .info-card .cta{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);background:var(--color-primary);color:#fff;border-radius:var(--radius-sm);font-size:var(--text-sm);font-weight:600;transition:background var(--transition)}
 .info-card .cta:hover{background:var(--color-primary-hover)}
 
+/* ═══════════════════ FULLSCREEN TOGGLE ═══════════════════ */
+.fs-btn{position:absolute;bottom:calc(var(--space-3) + env(safe-area-inset-bottom, 0px));right:var(--space-3);z-index:120;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-muted);cursor:pointer;box-shadow:var(--shadow-md);transition:background 180ms var(--ease-out),color 180ms,transform 120ms}
+.fs-btn:hover{background:var(--color-surface-2);color:var(--color-text);transform:scale(1.08)}
+.fs-btn:active{transform:scale(0.94)}
+.fs-btn svg{width:22px;height:22px}
+.fs-btn .fs-exit{display:none}
+.fs-btn.is-fs .fs-enter{display:none}
+.fs-btn.is-fs .fs-exit{display:block}
+[data-theme="light"] .fs-btn{background:rgba(255,255,255,0.92);border-color:rgba(0,0,0,0.1)}
+
 /* ═══════════════════ MOBILE ═══════════════════ */
 @media(max-width:768px){
+  .fs-btn{display:none}
   header{padding:var(--space-1) var(--space-2);gap:var(--space-2)}
   .logo-group h1 span{display:none}
   .logo-group h1{font-size:0.85rem}
@@ -502,6 +513,10 @@ main{position:relative;overflow:hidden}
       </div>
     </div>
   </main>
+  <button id="btn-fullscreen" class="fs-btn" aria-label="Toggle fullscreen" title="Toggle fullscreen">
+    <svg class="fs-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+    <svg class="fs-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+  </button>
 </div>
 
 <!-- Three.js + OrbitControls from CDN -->
@@ -2090,6 +2105,20 @@ document.getElementById('btn-theme').addEventListener('click', () => {
     ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
     : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
 });
+
+// Fullscreen toggle
+const fsBtn = document.getElementById('btn-fullscreen');
+function updateFsBtn() {
+  fsBtn.classList.toggle('is-fs', !!document.fullscreenElement);
+}
+fsBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+});
+document.addEventListener('fullscreenchange', updateFsBtn);
 
 // Info overlay
 document.getElementById('btn-info').addEventListener('click', () => {
