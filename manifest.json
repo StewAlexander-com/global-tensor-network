@@ -1,0 +1,42 @@
+{
+  "name": "Global Systems Tensor Network",
+  "short_name": "Tensor Network",
+  "description": "Interactive 3D model of 15 interconnected global systems — energy, climate, AI, water, geopolitics — showing causal push/pull couplings with cited sources.",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0e14",
+  "theme_color": "#4F98A3",
+  "categories": ["education", "science", "visualization"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Global Systems Tensor Network — 3D interactive model of 15 interconnected systems"
+    }
+  ]
+}

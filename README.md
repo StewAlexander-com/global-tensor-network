@@ -42,8 +42,8 @@ This model maps 15 global systems with push/pull couplings between them. Each ed
 
 ## Interactive Features
 
-- **Force-directed graph** — drag nodes, zoom, pan
-- **Click any node** — detail panel with stats, description, key facts, and all couplings with source citations
+- **3D tensor network** — rotate, zoom, and pan across a full 3D visualization with logarithmic-scaled node spacing
+- **Click any node** — focused zoom brings the selected node forward; infographic-style detail panel with stats, key facts, and all couplings with source citations
 - **Click any edge** — see the coupling mechanism and source
 - **5 stress-test scenarios:**
   - Baseline
@@ -53,7 +53,8 @@ This model maps 15 global systems with push/pull couplings between them. Each ed
   - Climate +2°C (agricultural/water cascade)
 - **NH₃ button** — highlight the ammonia structural fix pathway
 - **Dark/light mode**
-- **Responsive** — works on desktop and mobile
+- **Responsive** — mobile-optimized bottom-sheet panel, desktop sidebar, iOS touch handling
+- **PWA** — installable as a standalone app on mobile and desktop
 
 ## Data Sources
 
@@ -71,11 +72,13 @@ All coupling weights are directional and sourced from:
 
 ## Technology
 
-Zero dependencies beyond D3.js v7. Single HTML file, ~1700 lines. No build step.
+Single HTML file. No build step. No bundler.
 
-- **D3.js** — Force-directed graph simulation
-- **Vanilla CSS** — Custom properties, fluid type scale, dark/light mode
+- **Three.js r170** — 3D WebGL rendering with OrbitControls
+- **Vanilla CSS** — Custom properties, fluid type scale, dark/light mode, backdrop-filter blur
 - **General Sans** (Fontshare) + JetBrains Mono — Typography
+- **Progressive Web App** — manifest.json, app icons (192/512/maskable), apple-touch-icon, favicons
+- **SEO** — Open Graph, Twitter Card, JSON-LD structured data, canonical URL
 
 ## Local Development
 
@@ -94,11 +97,11 @@ Open `http://localhost:3000` (or `:8000`).
 
 ## Deployment
 
-This is a static site. Deploy the `index.html` to any static host:
+Static site — deploy `index.html`, `manifest.json`, and the `icons/` directory to any static host:
 
 - **GitHub Pages** — Push to `main`, enable Pages in repo settings
 - **Netlify/Vercel** — Point at the repo root
-- **S3/CloudFront** — Upload `index.html`
+- **S3/CloudFront** — Upload all files
 
 ## Contributing
 
