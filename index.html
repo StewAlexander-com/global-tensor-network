@@ -211,7 +211,7 @@ main{position:relative;overflow:hidden}
 .ig-tldr{display:inline-flex;align-items:center;gap:4px;background:rgba(79,152,163,0.12);color:var(--color-primary);font-size:12px;font-weight:600;padding:3px 10px;border-radius:10px;margin-bottom:var(--space-2);text-transform:uppercase;letter-spacing:0.04em}
 
 /* ── Node role badge ── */
-.ig-role{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
+.ig-role{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
 .ig-role.amplifier{background:rgba(63,185,80,0.15);color:var(--color-positive)}
 .ig-role.destabilizer{background:rgba(248,81,73,0.15);color:var(--color-negative)}
 .ig-role.bridge{background:rgba(210,153,34,0.15);color:var(--color-warning)}
@@ -227,7 +227,7 @@ main{position:relative;overflow:hidden}
 .ig-sysbar-counts{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-top:3px}
 
 /* ── Coupling strength label ── */
-.ig-strength{font-size:10px;font-weight:500;padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.ig-strength{font-size:13px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0}
 .ig-strength.strong-pos{background:rgba(63,185,80,0.12);color:var(--color-positive)}
 .ig-strength.mod-pos{background:rgba(63,185,80,0.08);color:var(--color-positive)}
 .ig-strength.strong-neg{background:rgba(248,81,73,0.12);color:var(--color-negative)}
@@ -351,10 +351,10 @@ main{position:relative;overflow:hidden}
   .ig-edge-wt{font-size:1.3rem}
   .coupling-badge{font-size:0.8rem}
   .source-tag{font-size:0.75rem}
-  .ig-role{font-size:0.7rem;padding:2px 8px;margin-left:4px}
+  .ig-role{font-size:0.85rem;padding:3px 9px;margin-left:4px}
   .ig-sysbar-label{font-size:0.75rem}
   .ig-sysbar-counts{font-size:0.8rem}
-  .ig-strength{font-size:0.7rem;padding:2px 6px}
+  .ig-strength{font-size:0.85rem;padding:3px 8px}
   .panel-section{margin-bottom:var(--space-2)}
 }
 :focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--radius-sm)}
@@ -1700,9 +1700,9 @@ function getNodeRole(pushCount, pullCount, mixCount, outgoing) {
 }
 
 function getStrengthLabel(type, w) {
-  if (type === 'positive') return w >= 4 ? { cls: 'strong-pos', text: 'Strong reinforcer' } : { cls: 'mod-pos', text: 'Reinforcer' };
-  if (type === 'negative') return w >= 4 ? { cls: 'strong-neg', text: 'Critical risk' } : { cls: 'mod-neg', text: 'Stressor' };
-  return { cls: 'mixed', text: 'Double-edged' };
+  if (type === 'positive') return w >= 4 ? { cls: 'strong-pos', text: 'Key driver' } : { cls: 'mod-pos', text: 'Reinforcer' };
+  if (type === 'negative') return w >= 4 ? { cls: 'strong-neg', text: 'High risk' } : { cls: 'mod-neg', text: 'Stressor' };
+  return { cls: 'mixed', text: 'Mixed' };
 }
 
 function showNodePanel(node) {
