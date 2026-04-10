@@ -192,6 +192,9 @@ main{position:relative;overflow:hidden}
 [data-theme="light"] .scroll-chev{background:rgba(255,245,200,0.95);color:#a07800;border-color:rgba(180,150,40,0.5);box-shadow:0 2px 10px rgba(180,150,40,0.2),0 1px 4px rgba(0,0,0,0.1)}
 [data-theme="light"] .scroll-chev:hover{background:#f5c83c;color:#1a1a1a;border-color:#d4a800}
 .panel-section{margin-bottom:var(--space-3)}
+
+#panel-title{letter-spacing:0.04em;text-transform:uppercase;font-size:clamp(16px,3.5vw,20px)}
+.panel-section h3{letter-spacing:0.1em}
 .panel-section h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);margin-bottom:var(--space-1)}
 
 /* ── Infographic Stats Row ── */
@@ -273,7 +276,22 @@ main{position:relative;overflow:hidden}
 .coupling-badge.mixed{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 
 /* ═══════════════════ FOCUS MODE ═══════════════════ */
-.focused-label{font-size:17px!important;font-weight:700!important;text-shadow:0 2px 8px var(--color-bg),0 0 16px var(--color-bg),0 0 32px var(--color-bg)!important}
+
+/* ─── SVG Node Icons ─── */
+.ni{width:1em;height:1em;display:inline-block;vertical-align:-0.12em;flex-shrink:0}
+.ni-util{width:1.1em;height:1.1em}
+.ig-fact-icon .ni{width:20px;height:20px}
+.ig-en-icon .ni{width:24px;height:24px;display:block;margin:0 auto 2px}
+.ig-flow-name .ni{width:14px;height:14px;margin-right:2px}
+.si{width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:2px}
+
+/* ─── Cinematic Label Typography ─── */
+
+/* ─── Cinematic Node Labels ─── */
+.lbl-icon{margin-right:3px;filter:drop-shadow(0 0 3px currentColor)}
+.lbl-text{text-transform:uppercase;letter-spacing:0.1em;font-weight:600;font-size:inherit}
+
+.focused-label{font-size:17px!important;font-weight:700!important;letter-spacing:0.12em!important;text-shadow:0 2px 8px var(--color-bg),0 0 16px var(--color-bg),0 0 32px var(--color-bg)!important}
 #focus-back{position:absolute;top:calc(var(--space-4) + 44px);left:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-1) var(--space-3);font-size:14px;font-weight:500;color:var(--color-text-muted);cursor:pointer;z-index:120;opacity:0;pointer-events:none;transition:opacity 300ms var(--ease-out),background 180ms;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:var(--space-1)}
 #focus-back.visible{opacity:1;pointer-events:auto}
 #focus-back:hover{background:var(--color-surface-2);color:var(--color-text)}
@@ -316,7 +334,22 @@ main{position:relative;overflow:hidden}
   #scenario-bar{gap:2px}
   #legend{display:none}
   #focus-back{font-size:0.85rem}
-  .focused-label{font-size:1.05rem!important}
+  
+/* ─── SVG Node Icons ─── */
+.ni{width:1em;height:1em;display:inline-block;vertical-align:-0.12em;flex-shrink:0}
+.ni-util{width:1.1em;height:1.1em}
+.ig-fact-icon .ni{width:20px;height:20px}
+.ig-en-icon .ni{width:24px;height:24px;display:block;margin:0 auto 2px}
+.ig-flow-name .ni{width:14px;height:14px;margin-right:2px}
+.si{width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:2px}
+
+/* ─── Cinematic Label Typography ─── */
+
+/* ─── Cinematic Node Labels ─── */
+.lbl-icon{margin-right:3px;filter:drop-shadow(0 0 3px currentColor)}
+.lbl-text{text-transform:uppercase;letter-spacing:0.1em;font-weight:600;font-size:inherit}
+
+.focused-label{font-size:1.05rem!important}
   /* Bottom sheet panel */
   #detail-panel{
     top:auto;bottom:0;left:0;right:0;
@@ -336,7 +369,10 @@ main{position:relative;overflow:hidden}
   .panel-header h2{font-size:1.2rem}
   .panel-close{width:2.2rem;height:2.2rem;font-size:1.15rem}
   .panel-body{padding:var(--space-1) var(--space-3) var(--space-2)}
-  .panel-section h3{font-size:0.85rem}
+  
+#panel-title{letter-spacing:0.04em;text-transform:uppercase;font-size:clamp(16px,3.5vw,20px)}
+.panel-section h3{letter-spacing:0.1em}
+.panel-section h3{font-size:0.85rem}
   .ig-tldr{font-size:0.85rem;padding:3px 10px}
   .desc-text{font-size:0.95rem}
   .ig-stats{gap:4px}
@@ -417,11 +453,11 @@ main{position:relative;overflow:hidden}
     </div>
 
     <div id="scenario-bar">
-      <button class="scenario-btn active" data-scenario="baseline">⊙ Baseline</button>
-      <button class="scenario-btn" data-scenario="hormuz">⚠ Hormuz</button>
-      <button class="scenario-btn" data-scenario="ammonia">⚗ NH₃ Fix</button>
-      <button class="scenario-btn" data-scenario="ai-surge">⚡ AI Surge</button>
-      <button class="scenario-btn" data-scenario="climate">🌡 +2°C</button>
+      <button class="scenario-btn active" data-scenario="baseline"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Baseline</button>
+      <button class="scenario-btn" data-scenario="hormuz"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Hormuz</button>
+      <button class="scenario-btn" data-scenario="ammonia"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v7.53L6 18a2 2 0 0 0 1.73 3h8.54A2 2 0 0 0 18 18l-4-7.47V3"/><circle cx="12" cy="16" r="1" fill="currentColor"/><circle cx="9" cy="18" r="0.7" fill="currentColor"/><circle cx="15" cy="18" r="0.7" fill="currentColor"/></svg> NH₃ Fix</button>
+      <button class="scenario-btn" data-scenario="ai-surge"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> AI Surge</button>
+      <button class="scenario-btn" data-scenario="climate"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg> +2°C</button>
     </div>
 
     <div id="detail-panel">
@@ -472,49 +508,49 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
    MODEL DATA — 15 nodes, 60+ directed edges
    ═══════════════════════════════════════════════ */
 const NODES = [
-  { id:"energy_density", label:"Energy Density", icon:"⚡", color:"#f0c929", cat:"infrastructure",
+  { id:"energy_density", label:"Energy Density", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`, color:"#f0c929", cat:"infrastructure",
     desc:"Energy stored per unit volume/mass. Determines transportability, scalability, cost. The most-connected node.",
     fact:"NH₃: 12.7 MJ/L vs liquid H₂: 8.5 MJ/L — 50% more hydrogen per litre", src:"ACS Energy Letters, EIA" },
-  { id:"oil_gas", label:"Oil & Gas", icon:"🛢", color:"#8d6538", cat:"energy",
+  { id:"oil_gas", label:"Oil & Gas", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"/></svg>`, color:"#8d6538", cat:"energy",
     desc:"Global petroleum and natural gas. 20M bbl/day transit Hormuz — ~20% of global consumption.",
     fact:"84% of Hormuz crude flows go to Asian markets", src:"EIA (2024)" },
-  { id:"chokepoints", label:"Maritime Chokepoints", icon:"⚓", color:"#3a7bd5", cat:"infrastructure",
+  { id:"chokepoints", label:"Maritime Chokepoints", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="21"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>`, color:"#3a7bd5", cat:"infrastructure",
     desc:"Hormuz, Malacca, Suez, Bab el-Mandeb, Panama. Closure cascades through energy, food, finance.",
     fact:"Hormuz: 20M bbl/day oil + 1/5 LNG + 1/3 fertilizer trade", src:"EIA, Fortune (2026)" },
-  { id:"agriculture", label:"Agriculture & Food", icon:"🌾", color:"#7cb342", cat:"human",
+  { id:"agriculture", label:"Agriculture & Food", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M5 12s2.5-5 7-5"/><path d="M19 12s-2.5-5-7-5"/><path d="M7 6s1.5-4 5-4"/><path d="M17 6s-1.5-4-5-4"/><path d="M3 18s3-3 9-3 9 3 9 3"/></svg>`, color:"#7cb342", cat:"human",
     desc:"Global food production and fertilizer supply chains. Depends on N, P, K delivery.",
     fact:"N-fertilizer production down 20% after Hormuz; prices +70%", src:"Carnegie Endowment (2026)" },
-  { id:"water", label:"Water Systems", icon:"💧", color:"#29b6f6", cat:"environment",
+  { id:"water", label:"Water Systems", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"/><path d="M8 14a2 2 0 1 0 0 4" opacity="0.5"/></svg>`, color:"#29b6f6", cat:"environment",
     desc:"Freshwater, irrigation, desalination, water-energy-food nexus.",
     fact:"AI data centers: 4.2–6.6B m³ water projected by 2027", src:"AIMultiple, Nature (2025)" },
-  { id:"climate", label:"Climate System", icon:"🌡", color:"#ef5350", cat:"environment",
+  { id:"climate", label:"Climate System", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>`, color:"#ef5350", cat:"environment",
     desc:"GHG emissions, temperature rise, extreme weather, carbon cycle feedbacks.",
     fact:"17% agricultural decline projected by 2050 (Mediterranean)", src:"Nature (2025)" },
-  { id:"ai_compute", label:"AI & Compute", icon:"🤖", color:"#7c4dff", cat:"technology",
+  { id:"ai_compute", label:"AI & Compute", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>`, color:"#7c4dff", cat:"technology",
     desc:"AI infrastructure and data centers. GPU servers: 3,000–5,000+ W vs 300–500 W traditional.",
     fact:"US data centers: 176 TWh (2023) → 325–580 TWh by 2028", src:"LBNL, Belfer Center (2026)" },
-  { id:"critical_minerals", label:"Critical Minerals", icon:"⛏", color:"#8d6e63", cat:"resources",
+  { id:"critical_minerals", label:"Critical Minerals", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3l1 12"/><path d="M2 9h20"/><path d="M6 3l5 6"/><path d="M18 3l-5 6"/></svg>`, color:"#8d6e63", cat:"resources",
     desc:"Li, Co, rare earths, Cu, Ni, graphite. Concentrated in few countries.",
     fact:"Top-3 refiners hold 86% share (up from 82% in 2020)", src:"IEA (2025)" },
-  { id:"geopolitics", label:"Geopolitics", icon:"🌐", color:"#ff7043", cat:"governance",
+  { id:"geopolitics", label:"Geopolitics", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`, color:"#ff7043", cat:"governance",
     desc:"Interstate competition, sanctions, trade restrictions, military conflicts.",
     fact:"55% of energy strategic minerals under export controls", src:"IEA (2025)" },
-  { id:"political_stability", label:"Political Stability", icon:"🏛", color:"#ffab40", cat:"governance",
+  { id:"political_stability", label:"Political Stability", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><line x1="9" y1="21" x2="9" y2="10"/><line x1="15" y1="21" x2="15" y2="10"/></svg>`, color:"#ffab40", cat:"governance",
     desc:"Domestic stability, governance capacity. Food/energy shocks propagate instability.",
     fact:"45M additional food-insecure if Hormuz persists (WFP)", src:"WFP, The Conversation (2026)" },
-  { id:"resource_nationalism", label:"Resource Nationalism", icon:"🚩", color:"#e53935", cat:"governance",
+  { id:"resource_nationalism", label:"Resource Nationalism", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="2" x2="4" y2="22"/><path d="M4 4h16l-3 4 3 4H4"/></svg>`, color:"#e53935", cat:"governance",
     desc:"Export restrictions on strategic resources. China phosphate restrictions cut 25% of global supply.",
     fact:"Russia halted NH₄NO₃ exports; China restricted phosphate — simultaneous", src:"Carnegie Endowment (2026)" },
-  { id:"renewable_energy", label:"Renewable Energy", icon:"☀", color:"#66bb6a", cat:"energy",
+  { id:"renewable_energy", label:"Renewable Energy", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`, color:"#66bb6a", cat:"energy",
     desc:"Solar, wind, hydro. Land-use can conflict with food production.",
     fact:"Hydropower vulnerable to drought; land conflicts with agriculture", src:"Nature (2025)" },
-  { id:"ammonia", label:"Ammonia (NH₃)", icon:"⚗", color:"#da8ee7", cat:"solution",
+  { id:"ammonia", label:"Ammonia (NH₃)", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v7.53L6 18a2 2 0 0 0 1.73 3h8.54A2 2 0 0 0 18 18l-4-7.47V3"/><circle cx="12" cy="16" r="1" fill="currentColor"/><circle cx="9" cy="18" r="0.7" fill="currentColor"/><circle cx="15" cy="18" r="0.7" fill="currentColor"/></svg>`, color:"#da8ee7", cat:"solution",
     desc:"H₂ carrier, fertilizer, and fuel. 12.7 MJ/L at −33°C. Synthesizable from water+air+electricity anywhere.",
     fact:"Only node improving energy density, climate, agriculture AND reducing resource concentration simultaneously", src:"ACS Energy Letters (2021)" },
-  { id:"supply_chains", label:"Global Supply Chains", icon:"🔗", color:"#78909c", cat:"infrastructure",
+  { id:"supply_chains", label:"Global Supply Chains", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`, color:"#78909c", cat:"infrastructure",
     desc:"International logistics, shipping, JIT manufacturing. Chokepoint-vulnerable.",
     fact:"A captain braving Hormuz carries oil over fertilizer — lower-value goods get stranded", src:"Carnegie Endowment (2026)" },
-  { id:"financial_markets", label:"Financial Markets", icon:"📈", color:"#26a69a", cat:"economic",
+  { id:"financial_markets", label:"Financial Markets", icon:`<svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`, color:"#26a69a", cat:"economic",
     desc:"Commodity markets, energy pricing, food price indices, capital flows.",
     fact:"Hormuz closure: crude to $100/bbl. Fertilizer +40% in one month", src:"Fortune (2026)" }
 ];
@@ -1267,7 +1303,7 @@ document.querySelector('main').appendChild(labelContainer);
 
 const labelEls = NODES.map((n, i) => {
   const el = document.createElement('div');
-  el.style.cssText = `position:absolute;font:500 13px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none`;
+  el.style.cssText = `position:absolute;font:600 12px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:3px 8px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 6px var(--color-bg),0 0 12px var(--color-bg),0 0 24px rgba(0,0,0,0.4);transition:opacity 200ms;letter-spacing:0.08em;text-transform:uppercase;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none`;
   /* Tap-vs-drag: only open panel on genuine taps, not drag/rotate starts.
      On mobile, labels use pointer-events:none during active touches so
      OrbitControls handles rotation/zoom directly on canvas. Taps are
@@ -1297,7 +1333,7 @@ const labelEls = NODES.map((n, i) => {
     }
   });
   el.addEventListener('lostpointercapture', () => { _pid = null; });
-  el.textContent = `${n.icon} ${n.label}`;
+  el.innerHTML = `<span class="lbl-icon" style="color:${n.color}">${n.icon}</span><span class="lbl-text">${n.label}</span>`;
   labelContainer.appendChild(el);
   return el;
 });
@@ -1386,7 +1422,7 @@ canvas.addEventListener('pointermove', (ev) => {
     const hit = nodeHits[0].object;
     const n = hit.userData.node;
     canvas.style.cursor = 'pointer';
-    hoverLabel.querySelector('h4').textContent = `${n.icon} ${n.label}`;
+    hoverLabel.querySelector('h4').innerHTML = `<span style="color:${n.color}">${n.icon}</span> ${n.label}`;
     hoverLabel.querySelector('.hl-sub').textContent = `${n.connections} connections · Click for details`;
     hoverLabel.classList.add('visible');
     hoverLabel.style.left = (ev.clientX - canvas.getBoundingClientRect().left + 14) + 'px';
@@ -1748,7 +1784,7 @@ function showNodePanel(node) {
   const impactPct = Math.round((impactScore / maxImpact) * 100);
   const roleInfo = getNodeRole(pushCount, pullCount, mixCount, outgoing);
 
-  panelTitle.textContent = `${node.icon} ${node.label}`;
+  panelTitle.innerHTML = `<span style="color:${node.color};margin-right:6px">${node.icon}</span>${node.label}`;
 
   /* TL;DR + Role + Desc */
   let html = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:var(--space-1)">
@@ -1788,7 +1824,7 @@ function showNodePanel(node) {
   }
 
   /* Key fact callout */
-  html += `<div class="ig-fact"><div class="ig-fact-icon">💡</div><div><div class="ig-fact-text">${node.fact}</div><span class="ig-fact-src">${node.src}</span></div></div>`;
+  html += `<div class="ig-fact"><div class="ig-fact-icon" style="color:var(--color-primary)"><svg class="ni ni-util" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></div><div><div class="ig-fact-text">${node.fact}</div><span class="ig-fact-src">${node.src}</span></div></div>`;
 
   /* Coupling flows — with strength labels */
   const renderFlows = (title, edges, isOut) => {
@@ -1801,7 +1837,7 @@ function showNodePanel(node) {
       const sl = getStrengthLabel(e.type, e.w);
       h += `<div class="ig-flow" onclick="this.classList.toggle('expanded')">
         <div class="ig-flow-arrow ${ac}">${as}</div>
-        <div class="ig-flow-name">${other.icon} ${other.label}</div>
+        <div class="ig-flow-name"><span style="color:${other.color}">${other.icon}</span> ${other.label}</div>
         <span class="ig-strength ${sl.cls}">${sl.text}</span>
         <div class="ig-flow-w">${e.w}/5</div>
         <div class="ig-flow-detail">${e.mech}<br><span class="source-tag">${e.cite}</span></div>
@@ -1829,15 +1865,15 @@ function showEdgePanel(edge, si, ti) {
   const info = typeExplain[edge.type];
   const sl = getStrengthLabel(edge.type, edge.w);
 
-  panelTitle.textContent = `${sn.icon} → ${tn.icon}`;
+  panelTitle.innerHTML = `<span style="color:${sn.color}">${sn.icon}</span> <span style="color:var(--color-text-faint)">→</span> <span style="color:${tn.color}">${tn.icon}</span>`;
   panelBody.innerHTML = `
     <div class="ig-edge-vis">
-      <div class="ig-edge-node"><span class="ig-en-icon">${sn.icon}</span>${sn.label}</div>
+      <div class="ig-edge-node"><span class="ig-en-icon" style="color:${sn.color}">${sn.icon}</span>${sn.label}</div>
       <div class="ig-edge-arrow">
         <svg viewBox="0 0 40 16" fill="none"><path d="M0 8h32M28 3l6 5-6 5" stroke="${info.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span class="coupling-badge ${edge.type}">${info.label}</span>
       </div>
-      <div class="ig-edge-node"><span class="ig-en-icon">${tn.icon}</span>${tn.label}</div>
+      <div class="ig-edge-node"><span class="ig-en-icon" style="color:${tn.color}">${tn.icon}</span>${tn.label}</div>
     </div>
     <div style="text-align:center;margin-bottom:8px">
       <div class="ig-edge-wt" style="color:${info.color}">${edge.w}<span style="font-size:14px;color:var(--color-text-faint)">/5</span></div>
@@ -1845,7 +1881,7 @@ function showEdgePanel(edge, si, ti) {
       <div style="font-size:13px;color:var(--color-text-muted);margin-top:4px">Coupling Strength — <span class="ig-strength ${sl.cls}">${sl.text}</span></div>
     </div>
     <div class="desc-text" style="text-align:center;margin-bottom:var(--space-2);font-style:italic">${info.explain}</div>
-    <div class="ig-fact"><div class="ig-fact-icon">⚙️</div><div><div class="ig-fact-text" style="color:var(--color-text)">${edge.mech}</div><span class="ig-fact-src">${edge.cite}</span></div></div>`;
+    <div class="ig-fact"><div class="ig-fact-icon" style="color:var(--color-text-muted)"><svg class="ni ni-util" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div><div class="ig-fact-text" style="color:var(--color-text)">${edge.mech}</div><span class="ig-fact-src">${edge.cite}</span></div></div>`;
   panelBody.scrollTop = 0;
   panelEl.classList.add('open');
   requestAnimationFrame(updateChevrons);
