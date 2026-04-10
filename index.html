@@ -896,12 +896,12 @@ composer.addPass(godRayPass);
 const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.dampingFactor = isMobile ? 0.18 : 0.12;
-controls.minDistance = 20;
-controls.maxDistance = 300;
+controls.dampingFactor = isMobile ? 0.14 : 0.12;
+controls.minDistance = isMobile ? 10 : 20;
+controls.maxDistance = isMobile ? 500 : 300;
 controls.enablePan = true;
-controls.panSpeed = isMobile ? 0.7 : 0.8;
-controls.zoomSpeed = isMobile ? 1.2 : 1.5;
+controls.panSpeed = isMobile ? 1.0 : 0.8;
+controls.zoomSpeed = isMobile ? 1.6 : 1.5;
 controls.rotateSpeed = isMobile ? 1.0 : 0.8;
 controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
@@ -1980,8 +1980,8 @@ function resize() {
   camera.aspect = w / h;
   const aspect = w / h;
   if (aspect < 1) {
-    camera.fov = 65;
-    if (!initialResizeDone) camera.position.z = 180;
+    camera.fov = 60;
+    if (!initialResizeDone) camera.position.z = 75;
   } else {
     camera.fov = 50;
     if (!initialResizeDone) camera.position.z = 110;
