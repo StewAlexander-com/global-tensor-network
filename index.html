@@ -8,6 +8,9 @@
 <meta name="keywords" content="tensor network, systems thinking, global systems, interactive model, 3D visualization, energy, climate, AI, geopolitics, water, critical minerals, causal coupling, systems dynamics">
 <meta name="author" content="Stewart Alexander">
 <meta name="robots" content="index, follow">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="canonical" href="https://stewalexander-com.github.io/global-tensor-network/">
 
 <!-- Open Graph / Facebook / LinkedIn -->
@@ -2023,7 +2026,7 @@ const AudioEngine = (() => {
   let audioEnabled = true;
   let audioInitialized = false;
   let ambientStarted = false;
-  const AMBIENT_VOLUME = 0.15;
+  const AMBIENT_VOLUME = 0.08;
   const SFX_VOLUME = 0.5;
 
   function init() {
@@ -2057,7 +2060,7 @@ const AudioEngine = (() => {
 
   async function loadAmbient() {
     try {
-      const res = await fetch('ambient.mp3');
+      const res = await fetch('ambient.mp3?v=' + Date.now());
       const buf = await res.arrayBuffer();
       ambientBuffer = await ctx.decodeAudioData(buf);
       // If start() was already called before buffer loaded, play now
