@@ -1303,16 +1303,29 @@ const labelEls = NODES.map((n, i) => {
 });
 
 /* Update label positions each frame */
+const _labelWorldPos = new THREE.Vector3();
 function updateLabels() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   nodeMeshes.forEach((mesh, i) => {
-    const v = mesh.position.clone().project(camera);
+    // Get actual world position (accounts for group rotation/transform)
+    mesh.getWorldPosition(_labelWorldPos);
+    const v = _labelWorldPos.clone().project(camera);
     const x = (v.x * 0.5 + 0.5) * w;
     const y = (-v.y * 0.5 + 0.5) * h;
     const el = labelEls[i];
+
+    // Calculate screen-space offset based on projected node radius
+    const r = mesh.geometry.parameters.radius || 1;
+    const scale = mesh.scale.x || 1;
+    const offsetWorld = _labelWorldPos.clone();
+    offsetWorld.y += r * scale + 0.3;
+    const vOff = offsetWorld.project(camera);
+    const yOff = (-vOff.y * 0.5 + 0.5) * h;
+    const screenOffset = Math.max(y - yOff, 6); // minimum 6px gap
+    const yTop = y - screenOffset;
+
     // Adjust label alignment to stay within viewport
     let lx = x;
-    const yTop = y - (mesh.geometry.parameters.radius || 1) * 8 - 4;
     if (w < 600) {
       const labelW = el.offsetWidth || 100;
       if (x + labelW / 2 > w - 4) {
