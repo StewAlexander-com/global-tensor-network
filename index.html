@@ -83,7 +83,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:var
 
 /* MAIN / CANVAS */
 main{position:relative;overflow:hidden}
-#three-canvas{width:100%;height:100%;display:block;outline:none}
+#three-canvas{width:100%;height:100%;display:block;outline:none;position:relative;z-index:1}
 
 /* ═══════════════════ HOVER LABEL ═══════════════════ */
 #hover-label{
@@ -133,6 +133,12 @@ main{position:relative;overflow:hidden}
 .coupling-arrow.mix{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 .coupling-target{font-weight:600}
 .coupling-desc{color:var(--color-text-muted);margin-top:1px;line-height:1.4}
+
+/* ═══════════════════ FOCUS MODE ═══════════════════ */
+.focused-label{font-size:14px!important;font-weight:700!important;text-shadow:0 2px 8px var(--color-bg),0 0 16px var(--color-bg),0 0 32px var(--color-bg)!important}
+#focus-back{position:absolute;top:calc(var(--space-4) + 44px);left:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-1) var(--space-3);font-size:12px;font-weight:500;color:var(--color-text-muted);cursor:pointer;z-index:120;opacity:0;pointer-events:none;transition:opacity 300ms var(--ease-out),background 180ms;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:var(--space-1)}
+#focus-back.visible{opacity:1;pointer-events:auto}
+#focus-back:hover{background:var(--color-surface-2);color:var(--color-text)}
 
 /* ═══════════════════ SCENARIO BAR ═══════════════════ */
 #scenario-bar{position:absolute;bottom:var(--space-3);left:50%;transform:translateX(-50%);display:flex;gap:var(--space-1);padding:var(--space-1) var(--space-2);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);z-index:100;max-width:calc(100vw - 1.5rem);overflow-x:auto}
@@ -212,6 +218,7 @@ main{position:relative;overflow:hidden}
     <canvas id="three-canvas"></canvas>
     <div id="hover-label"><h4></h4><div class="hl-sub"></div></div>
     <div id="orbit-hint">Drag to rotate · Scroll to zoom · Click a node</div>
+    <button id="focus-back">← Back to overview</button>
 
     <div id="legend">
       <div class="legend-row"><div class="legend-line" style="background:var(--color-positive)"></div>Push (reinforcing)</div>
@@ -583,7 +590,14 @@ document.querySelector('main').appendChild(labelContainer);
 const labelEls = NODES.map((n, i) => {
   const el = document.createElement('div');
   el.style.cssText = `position:absolute;font:500 11px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms`;
-  el.addEventListener('click', (ev) => { ev.stopPropagation(); showNodePanel(n); highlightNode(n.id); });
+  el.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showNodePanel(n);
+    highlightNode(n.id);
+    focusOnNode(i);
+    document.getElementById('focus-back').classList.add('visible');
+    document.getElementById('hover-label').classList.remove('visible');
+  });
   el.textContent = `${n.icon} ${n.label}`;
   labelContainer.appendChild(el);
   return el;
@@ -642,6 +656,12 @@ const hoverLabel = document.getElementById('hover-label');
 let hoveredObj = null;
 
 canvas.addEventListener('pointermove', (ev) => {
+  // Hide hover tooltip in focus mode
+  if (focusedNodeIdx >= 0) {
+    hoverLabel.classList.remove('visible');
+    canvas.style.cursor = 'grab';
+    return;
+  }
   const rect = canvas.getBoundingClientRect();
   mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
@@ -691,15 +711,23 @@ canvas.addEventListener('pointerdown', (ev) => {
   if (ud.node) {
     showNodePanel(ud.node);
     highlightNode(ud.node.id);
+    focusOnNode(ud.idx);
+    document.getElementById('focus-back').classList.add('visible');
+    hoverLabel.classList.remove('visible');
   } else if (ud.edge) {
     showEdgePanel(ud.edge, ud.si, ud.ti);
   }
 });
 
 /* ═══════════════════════════════════════════════
-   HIGHLIGHTING
+   HIGHLIGHTING & FOCUS ZOOM
    ═══════════════════════════════════════════════ */
 let activeScenario = 'baseline';
+let focusedNodeIdx = -1;
+let focusAnim = null; // { start, duration, fromPos, toPos, fromTarget, toTarget }
+const savedScales = NODES.map(() => 1);
+const FOCUS_ZOOM_DIST = 45; // How close to fly to the focused node
+const FOCUS_ANIM_MS = 700;
 
 function resetHighlights() {
   nodeMeshes.forEach((m, i) => {
@@ -707,12 +735,21 @@ function resetHighlights() {
     m.material.opacity = 1;
     m.material.transparent = false;
     NODES[i]._ring.material.opacity = 0.15;
+    // Reset scale
+    const baseR = 0.55 + NODES[i].connections * 0.1;
+    m.scale.setScalar(1);
+    savedScales[i] = 1;
   });
   edgeMeshes.forEach((line, i) => {
     line.material.color.set(EDGE_COLORS[EDGES[i].type]);
     line.material.opacity = 0.25;
   });
-  labelEls.forEach(el => el.style.opacity = '1');
+  labelEls.forEach(el => {
+    el.style.opacity = '1';
+    el.style.fontSize = '';
+    el.style.fontWeight = '';
+    el.classList.remove('focused-label');
+  });
 }
 
 function highlightNode(nodeId) {
@@ -723,21 +760,101 @@ function highlightNode(nodeId) {
   });
 
   nodeMeshes.forEach((m, i) => {
-    const vis = connected.has(NODES[i].id);
+    const nid = NODES[i].id;
+    const isFocus = nid === nodeId;
+    const vis = connected.has(nid);
     m.material.transparent = true;
-    m.material.opacity = vis ? 1 : 0.12;
-    NODES[i]._ring.material.opacity = vis ? 0.3 : 0.03;
+    m.material.opacity = isFocus ? 1 : vis ? 0.7 : 0.06;
+    NODES[i]._ring.material.opacity = isFocus ? 0.5 : vis ? 0.2 : 0.02;
+    // Scale up focused node
+    if (isFocus) {
+      m.scale.setScalar(1.8);
+      savedScales[i] = 1.8;
+    } else {
+      m.scale.setScalar(1);
+      savedScales[i] = 1;
+    }
   });
 
   edgeMeshes.forEach((line, i) => {
     const e = EDGES[i];
     const active = e.s === nodeId || e.t === nodeId;
-    line.material.opacity = active ? 0.7 : 0.04;
+    line.material.opacity = active ? 0.7 : 0.02;
   });
 
   labelEls.forEach((el, i) => {
-    el.style.opacity = connected.has(NODES[i].id) ? '1' : '0.15';
+    const nid = NODES[i].id;
+    const isFocus = nid === nodeId;
+    const vis = connected.has(nid);
+    el.style.opacity = isFocus ? '1' : vis ? '0.7' : '0.08';
+    if (isFocus) {
+      el.classList.add('focused-label');
+    } else {
+      el.classList.remove('focused-label');
+    }
   });
+}
+
+/* Camera fly-to animation */
+function focusOnNode(nodeIdx) {
+  autoRotate = false;
+  focusedNodeIdx = nodeIdx;
+  document.getElementById('orbit-hint').classList.add('hidden');
+  const mesh = nodeMeshes[nodeIdx];
+  // Compute world position accounting for group rotation
+  const worldPos = new THREE.Vector3();
+  mesh.getWorldPosition(worldPos);
+
+  // Target: look at the node, position camera offset toward current camera direction
+  const camDir = camera.position.clone().sub(controls.target).normalize();
+  const toPos = worldPos.clone().add(camDir.multiplyScalar(FOCUS_ZOOM_DIST));
+  const toTarget = worldPos.clone();
+
+  focusAnim = {
+    start: performance.now(),
+    duration: FOCUS_ANIM_MS,
+    fromPos: camera.position.clone(),
+    toPos,
+    fromTarget: controls.target.clone(),
+    toTarget
+  };
+}
+
+function exitFocus() {
+  const wasFocused = focusedNodeIdx >= 0;
+  focusedNodeIdx = -1;
+  document.getElementById('focus-back').classList.remove('visible');
+  resetHighlights();
+  if (activeScenario !== 'baseline') applyScenario(activeScenario);
+  panelEl.classList.remove('open');
+  if (wasFocused) {
+    // Animate back to overview
+    const aspect = canvas.clientWidth / canvas.clientHeight;
+    const overviewZ = aspect < 1 ? 180 : 110;
+    focusAnim = {
+      start: performance.now(),
+      duration: FOCUS_ANIM_MS,
+      fromPos: camera.position.clone(),
+      toPos: new THREE.Vector3(0, 0, overviewZ),
+      fromTarget: controls.target.clone(),
+      toTarget: new THREE.Vector3(0, 0, 0)
+    };
+  }
+}
+
+/* Smooth easeInOutCubic */
+function easeInOut(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function updateFocusAnim() {
+  if (!focusAnim) return;
+  const elapsed = performance.now() - focusAnim.start;
+  const t = Math.min(elapsed / focusAnim.duration, 1);
+  const e = easeInOut(t);
+  camera.position.lerpVectors(focusAnim.fromPos, focusAnim.toPos, e);
+  controls.target.lerpVectors(focusAnim.fromTarget, focusAnim.toTarget, e);
+  if (t >= 1) focusAnim = null;
 }
 
 function applyScenario(id) {
@@ -844,9 +961,12 @@ function showEdgePanel(edge, si, ti) {
 
 function closePanel() {
   panelEl.classList.remove('open');
+  document.getElementById('focus-back').classList.remove('visible');
+  focusedNodeIdx = -1;
   resetHighlights();
   if (activeScenario !== 'baseline') applyScenario(activeScenario);
 }
+/* exitFocus is the primary way to leave focus mode — animates camera back */
 
 /* ═══════════════════════════════════════════════
    ANIMATION LOOP
@@ -879,6 +999,7 @@ function animate() {
     nodeGroup.rotation.y += 0.001;
     edgeGroup.rotation.y += 0.001;
   }
+  updateFocusAnim();
   controls.update();
   updateRings();
   renderer.render(scene, camera);
@@ -905,9 +1026,14 @@ document.getElementById('btn-ammonia').addEventListener('click', () => {
 });
 
 document.getElementById('btn-reset').addEventListener('click', () => {
-  camera.position.set(0, 0, 110);
+  focusAnim = null;
+  focusedNodeIdx = -1;
+  document.getElementById('focus-back').classList.remove('visible');
+  const aspect = canvas.clientWidth / canvas.clientHeight;
+  camera.position.set(0, 0, aspect < 1 ? 180 : 110);
   camera.lookAt(0, 0, 0);
-  controls.reset();
+  controls.target.set(0, 0, 0);
+  controls.update();
   nodeGroup.rotation.set(0, 0, 0);
   edgeGroup.rotation.set(0, 0, 0);
   autoRotate = true;
@@ -940,11 +1066,13 @@ document.getElementById('info-close').addEventListener('click', () => {
 document.getElementById('info-overlay').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) document.getElementById('info-overlay').classList.remove('visible');
 });
-document.getElementById('panel-close').addEventListener('click', closePanel);
+document.getElementById('panel-close').addEventListener('click', exitFocus);
+document.getElementById('focus-back').addEventListener('click', exitFocus);
 
 // Keyboard
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    if (focusedNodeIdx >= 0) { exitFocus(); return; }
     closePanel();
     document.getElementById('info-overlay').classList.remove('visible');
   }
