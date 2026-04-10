@@ -306,7 +306,9 @@ main{position:relative;overflow:hidden}
   header{padding:var(--space-1) var(--space-2);gap:var(--space-2)}
   .logo-group h1 span{display:none}
   .logo-group h1{font-size:0.85rem}
-  .header-btn{padding:3px 8px;font-size:0.8rem}
+  .header-controls{gap:3px;flex-shrink:0}
+  .header-btn{padding:3px 6px;font-size:0.75rem;min-width:0}
+  .hide-mobile{display:none}
   .scenario-btn{padding:var(--space-1) 6px;font-size:0.8rem}
   #scenario-bar{gap:2px}
   #legend{display:none}
@@ -384,10 +386,14 @@ main{position:relative;overflow:hidden}
     <div class="header-controls">
       <button class="header-btn" id="btn-info" aria-label="About">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        About
+        <span class="hide-mobile">About</span>
       </button>
       <button class="header-btn" id="btn-ammonia" aria-label="NH3 pathway">NH₃</button>
       <button class="header-btn" id="btn-reset" aria-label="Reset view">⟳</button>
+      <button class="header-btn" id="btn-audio" aria-label="Toggle audio">
+        <svg id="audio-icon-on" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        <svg id="audio-icon-off" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      </button>
       <button class="header-btn" id="btn-theme" aria-label="Toggle theme">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
@@ -1531,6 +1537,7 @@ function highlightNode(nodeId) {
 
 /* Camera fly-to animation */
 function focusOnNode(nodeIdx) {
+  AudioEngine.focusZoom();
   autoRotate = false;
   focusedNodeIdx = nodeIdx;
   document.getElementById('orbit-hint').classList.add('hidden');
@@ -1592,6 +1599,7 @@ function updateFocusAnim() {
 }
 
 function applyScenario(id) {
+  AudioEngine.scenarioSwitch();
   activeScenario = id;
   document.querySelectorAll('.scenario-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === id));
   resetHighlights();
@@ -1706,6 +1714,7 @@ function getStrengthLabel(type, w) {
 }
 
 function showNodePanel(node) {
+  AudioEngine.nodeClick(); AudioEngine.panelOpen();
   const outgoing = EDGES.filter(e => e.s === node.id);
   const incoming = EDGES.filter(e => e.t === node.id);
   const all = [...outgoing, ...incoming];
@@ -1794,6 +1803,7 @@ function showNodePanel(node) {
 }
 
 function showEdgePanel(edge, si, ti) {
+  AudioEngine.edgeClick(); AudioEngine.panelOpen();
   const sn = NODES[si], tn = NODES[ti];
   const typeExplain = {
     positive: { label: 'REINFORCES', explain: 'Investment here strengthens the target system', color: 'var(--color-positive)' },
@@ -1826,6 +1836,7 @@ function showEdgePanel(edge, si, ti) {
 }
 
 function closePanel() {
+  AudioEngine.panelClose();
   panelEl.classList.remove('open');
   chevUp.classList.remove('visible');
   chevDown.classList.remove('visible');
@@ -1998,6 +2009,261 @@ document.addEventListener('keydown', (e) => {
 
 // Show intro
 setTimeout(() => document.getElementById('info-overlay').classList.add('visible'), 600);
+
+/* ══════════════════════════════════════════════════════════════
+   AUDIO ENGINE — Procedural UI SFX + Ambient Background Track
+   ══════════════════════════════════════════════════════════════ */
+const AudioEngine = (() => {
+  let ctx = null;
+  let masterGain = null;
+  let sfxGain = null;
+  let ambientGain = null;
+  let ambientSource = null;
+  let ambientBuffer = null;
+  let audioEnabled = true;
+  let audioInitialized = false;
+  let ambientStarted = false;
+  const AMBIENT_VOLUME = 0.33;
+  const SFX_VOLUME = 0.5;
+
+  function init() {
+    if (audioInitialized) return;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = 1.0;
+      masterGain.connect(ctx.destination);
+
+      sfxGain = ctx.createGain();
+      sfxGain.gain.value = SFX_VOLUME;
+      sfxGain.connect(masterGain);
+
+      ambientGain = ctx.createGain();
+      ambientGain.gain.value = 0;
+      ambientGain.connect(masterGain);
+
+      audioInitialized = true;
+      loadAmbient(); // preload the buffer (doesn't play yet)
+    } catch (e) { console.warn('AudioEngine: WebAudio not available'); }
+  }
+
+  // Call after init to actually begin playback
+  function start() {
+    if (ambientStarted || !audioInitialized) return;
+    ambientStarted = true;
+    audioEnabled = true;
+    startAmbient();
+  }
+
+  async function loadAmbient() {
+    try {
+      const res = await fetch('ambient.mp3');
+      const buf = await res.arrayBuffer();
+      ambientBuffer = await ctx.decodeAudioData(buf);
+      // If start() was already called before buffer loaded, play now
+      if (ambientStarted && audioEnabled) startAmbient();
+    } catch (e) { console.warn('AudioEngine: ambient track load failed', e); }
+  }
+
+  function startAmbient() {
+    if (!ambientBuffer || !ctx || !audioEnabled) return;
+    if (ambientSource) { try { ambientSource.stop(); } catch(e){} }
+    ambientSource = ctx.createBufferSource();
+    ambientSource.buffer = ambientBuffer;
+    ambientSource.loop = true;
+    ambientSource.connect(ambientGain);
+    ambientSource.start(0);
+    // Smooth fade in over 3 seconds
+    ambientGain.gain.cancelScheduledValues(ctx.currentTime);
+    ambientGain.gain.setValueAtTime(0, ctx.currentTime);
+    ambientGain.gain.linearRampToValueAtTime(AMBIENT_VOLUME, ctx.currentTime + 3);
+  }
+
+  function stopAmbient() {
+    if (!ambientSource || !ctx) return;
+    ambientGain.gain.cancelScheduledValues(ctx.currentTime);
+    ambientGain.gain.setValueAtTime(ambientGain.gain.value, ctx.currentTime);
+    ambientGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+    const src = ambientSource;
+    setTimeout(() => { try { src.stop(); } catch(e){} }, 600);
+    ambientSource = null;
+  }
+
+  function toggle() {
+    audioEnabled = !audioEnabled;
+    if (!audioInitialized && audioEnabled) { init(); return; }
+    if (audioEnabled) {
+      if (ctx && ctx.state === 'suspended') ctx.resume();
+      startAmbient();
+    } else {
+      stopAmbient();
+    }
+    // Update icon
+    document.getElementById('audio-icon-on').style.display = audioEnabled ? '' : 'none';
+    document.getElementById('audio-icon-off').style.display = audioEnabled ? 'none' : '';
+    document.getElementById('btn-audio').classList.toggle('active', audioEnabled);
+  }
+
+  // ── Procedural synth sound generators ──
+
+  function playTone(freq, duration, type, vol, attack, decay) {
+    if (!ctx || !audioEnabled) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(vol || 0.15, ctx.currentTime + (attack || 0.02));
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.2));
+    osc.connect(gain);
+    gain.connect(sfxGain);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + (duration || 0.2) + 0.05);
+  }
+
+  function playChord(freqs, duration, type, vol) {
+    freqs.forEach(f => playTone(f, duration, type, (vol || 0.08) / freqs.length));
+  }
+
+  // ── Named sound effects ──
+
+  function hover() {
+    playTone(800, 0.08, 'sine', 0.06, 0.01, 0.06);
+  }
+
+  function nodeClick() {
+    // Bright ascending arpeggio
+    playTone(440, 0.15, 'sine', 0.12, 0.01);
+    setTimeout(() => playTone(554, 0.12, 'sine', 0.10, 0.01), 50);
+    setTimeout(() => playTone(659, 0.18, 'triangle', 0.08, 0.01), 100);
+  }
+
+  function focusZoom() {
+    // Deep whoosh + rising shimmer
+    if (!ctx || !audioEnabled) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(120, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.connect(gain);
+    gain.connect(sfxGain);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.55);
+    // Add shimmer
+    setTimeout(() => playTone(1200, 0.3, 'sine', 0.05, 0.05), 150);
+  }
+
+  function panelOpen() {
+    // Soft ascending chime
+    playTone(523, 0.2, 'triangle', 0.10, 0.02);
+    setTimeout(() => playTone(659, 0.25, 'triangle', 0.08, 0.02), 80);
+  }
+
+  function panelClose() {
+    // Descending soft tone
+    playTone(523, 0.15, 'triangle', 0.08, 0.01);
+    setTimeout(() => playTone(392, 0.2, 'triangle', 0.06, 0.01), 60);
+  }
+
+  function scenarioSwitch() {
+    // Dramatic chord shift
+    playChord([220, 330, 440], 0.4, 'sine', 0.12);
+    setTimeout(() => playChord([261, 392, 523], 0.5, 'triangle', 0.08), 200);
+  }
+
+  function edgeClick() {
+    // Quick resonant ping
+    playTone(680, 0.12, 'sine', 0.10, 0.01);
+    setTimeout(() => playTone(850, 0.1, 'sine', 0.06, 0.01), 40);
+  }
+
+  function resetSound() {
+    // Reverse whoosh — descending
+    if (!ctx || !audioEnabled) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.35);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.connect(gain);
+    gain.connect(sfxGain);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.45);
+  }
+
+  function themeToggle() {
+    playTone(440, 0.1, 'sine', 0.08, 0.01);
+    setTimeout(() => playTone(660, 0.15, 'sine', 0.06, 0.01), 80);
+  }
+
+  return { init, start, toggle, hover, nodeClick, focusZoom, panelOpen,
+           panelClose, scenarioSwitch, edgeClick, resetSound, themeToggle,
+           get enabled() { return audioEnabled; } };
+})();
+
+// ── Audio UI sync ──
+function updateAudioUI() {
+  const on = AudioEngine.enabled;
+  document.getElementById('btn-audio').classList.toggle('active', on);
+  document.getElementById('audio-icon-on').style.display = on ? '' : 'none';
+  document.getElementById('audio-icon-off').style.display = on ? 'none' : '';
+}
+
+// Bootstrap audio on first user gesture — init context + auto-start ambient.
+// Skips clicks on the audio button (it has its own logic).
+let _audioBoot = false;
+function _bootAudio(e) {
+  if (_audioBoot) return;
+  if (e.target && e.target.closest && e.target.closest('#btn-audio')) return;
+  _audioBoot = true;
+  AudioEngine.init();
+  AudioEngine.start(); // auto-play ambient on first interaction
+  updateAudioUI();
+}
+['click','touchstart','keydown'].forEach(evt =>
+  document.addEventListener(evt, _bootAudio, { passive: true })
+);
+
+// Audio toggle button — first click inits + starts; subsequent clicks toggle
+document.getElementById('btn-audio').addEventListener('click', () => {
+  if (!_audioBoot) {
+    _audioBoot = true;
+    AudioEngine.init();
+    AudioEngine.start();
+  } else {
+    AudioEngine.toggle();
+  }
+  updateAudioUI();
+});
+
+// ── Wire audio into existing interaction handlers ──
+
+// Node hover sound (desktop only — throttled)
+let lastHoverSound = 0;
+canvas.addEventListener('pointermove', () => {
+  if (isMobile || Date.now() - lastHoverSound < 300) return;
+  // Only play if actually hovering a node (check if hover label is visible)
+  if (document.getElementById('hover-label').classList.contains('visible')) {
+    lastHoverSound = Date.now();
+    AudioEngine.hover();
+  }
+});
+
+// Reset button sound
+document.getElementById('btn-reset').addEventListener('click', () => AudioEngine.resetSound());
+
+// Theme toggle sound
+document.getElementById('btn-theme').addEventListener('click', () => AudioEngine.themeToggle());
 
 </script>
 </body>
