@@ -115,17 +115,16 @@ main{position:relative;overflow:hidden}
 .panel-body::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:3px}
 
 /* ── Scroll chevrons ── */
-@keyframes chev-bounce-down{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(5px)}}
-@keyframes chev-bounce-up{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
-.scroll-chev{position:absolute;left:50%;transform:translateX(-50%);z-index:10;width:54px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,200,60,0.45);border-radius:17px;background:rgba(50,45,20,0.88);color:#f5c83c;cursor:pointer;opacity:0;pointer-events:none;transition:opacity 200ms var(--ease-out);box-shadow:0 2px 12px rgba(245,200,60,0.18),0 1px 6px rgba(0,0,0,0.4)}
+@keyframes chev-bounce-down{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes chev-bounce-up{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.scroll-chev{flex-shrink:0;align-self:center;width:54px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,200,60,0.45);border-radius:14px;background:rgba(50,45,20,0.88);color:#f5c83c;cursor:pointer;opacity:0;pointer-events:none;transition:opacity 200ms var(--ease-out);box-shadow:0 2px 12px rgba(245,200,60,0.18),0 1px 6px rgba(0,0,0,0.4);margin:0}
 .scroll-chev.visible{opacity:1;pointer-events:auto}
 .scroll-chev-down.visible{animation:chev-bounce-down 1.6s ease-in-out infinite}
 .scroll-chev-up.visible{animation:chev-bounce-up 1.6s ease-in-out infinite}
 .scroll-chev:hover{background:rgba(245,200,60,0.92);color:#1a1a1a;border-color:#f5c83c;animation-play-state:paused}
-.scroll-chev:active{transform:translateX(-50%) scale(0.92);animation:none}
-.scroll-chev svg{width:22px;height:22px;stroke-width:3}
-.scroll-chev-up{top:6px}
-.scroll-chev-down{bottom:6px}
+.scroll-chev:active{transform:scale(0.92);animation:none}
+.scroll-chev svg{width:20px;height:20px;stroke-width:3}
+.scroll-chev:not(.visible){height:0;padding:0;border:0;overflow:hidden}
 [data-theme="light"] .scroll-chev{background:rgba(255,245,200,0.95);color:#a07800;border-color:rgba(180,150,40,0.5);box-shadow:0 2px 10px rgba(180,150,40,0.2),0 1px 4px rgba(0,0,0,0.1)}
 [data-theme="light"] .scroll-chev:hover{background:#f5c83c;color:#1a1a1a;border-color:#d4a800}
 .panel-section{margin-bottom:var(--space-3)}
@@ -360,11 +359,11 @@ main{position:relative;overflow:hidden}
         <h2 id="panel-title"></h2>
         <button class="panel-close" id="panel-close" aria-label="Close">✕</button>
       </div>
+      <button class="scroll-chev scroll-chev-up" id="chev-up" aria-label="Scroll up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
       <div class="panel-scroll-wrap">
-        <button class="scroll-chev scroll-chev-up" id="chev-up" aria-label="Scroll up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
         <div class="panel-body" id="panel-body"></div>
-        <button class="scroll-chev scroll-chev-down" id="chev-down" aria-label="Scroll down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
       </div>
+      <button class="scroll-chev scroll-chev-down" id="chev-down" aria-label="Scroll down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
     </div>
 
     <div id="info-overlay">
