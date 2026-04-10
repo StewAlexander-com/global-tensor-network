@@ -103,7 +103,7 @@ main{position:relative;overflow:hidden}
 .coupling-badge.mixed{background:rgba(210,153,34,0.15);color:var(--color-warning)}
 
 /* ═══════════════════ DETAIL PANEL ═══════════════════ */
-#detail-panel{position:absolute;top:0;right:0;width:380px;max-width:92vw;height:100%;background:var(--color-surface);border-left:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform 300ms var(--ease-out);z-index:150;display:flex;flex-direction:column;overflow:hidden}
+#detail-panel{position:absolute;top:0;right:0;width:380px;max-width:92vw;height:100%;background:var(--color-surface);border-left:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform 300ms var(--ease-out);z-index:150;display:flex;flex-direction:column;overflow:hidden;touch-action:pan-y;overscroll-behavior:contain}
 #detail-panel.open{transform:translateX(0)}
 .panel-header{display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-border);flex-shrink:0}
 .panel-header h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:var(--space-1)}
@@ -245,6 +245,7 @@ main{position:relative;overflow:hidden}
     border-radius:var(--radius-lg) var(--radius-lg) 0 0;
     transform:translateY(100%);transition:transform 300ms var(--ease-out);
     background:rgba(19,25,32,0.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+    touch-action:pan-y;overscroll-behavior:contain;
   }
   [data-theme="light"] #detail-panel{background:rgba(255,255,255,0.92)}
   #detail-panel.open{transform:translateY(0)}
@@ -693,13 +694,21 @@ document.querySelector('main').appendChild(labelContainer);
 const labelEls = NODES.map((n, i) => {
   const el = document.createElement('div');
   el.style.cssText = `position:absolute;font:500 13px/1.2 var(--font-body);color:var(--color-text);white-space:nowrap;transform:translate(-50%,-100%);padding:2px 6px;pointer-events:auto;cursor:pointer;text-shadow:0 1px 4px var(--color-bg),0 0 8px var(--color-bg);transition:opacity 200ms`;
-  el.addEventListener('click', (ev) => {
-    ev.stopPropagation();
-    showNodePanel(n);
-    highlightNode(n.id);
-    focusOnNode(i);
-    document.getElementById('focus-back').classList.add('visible');
-    document.getElementById('hover-label').classList.remove('visible');
+  /* Tap-vs-drag: only open panel on genuine taps, not drag/rotate starts */
+  let _px, _py, _pt;
+  el.addEventListener('pointerdown', (ev) => {
+    _px = ev.clientX; _py = ev.clientY; _pt = performance.now();
+  });
+  el.addEventListener('pointerup', (ev) => {
+    const dx = ev.clientX - _px, dy = ev.clientY - _py;
+    if (Math.hypot(dx, dy) < 10 && performance.now() - _pt < 350) {
+      ev.stopPropagation();
+      showNodePanel(n);
+      highlightNode(n.id);
+      focusOnNode(i);
+      document.getElementById('focus-back').classList.add('visible');
+      document.getElementById('hover-label').classList.remove('visible');
+    }
   });
   el.textContent = `${n.icon} ${n.label}`;
   labelContainer.appendChild(el);
@@ -808,8 +817,15 @@ canvas.addEventListener('pointermove', (ev) => {
   hoveredObj = null;
 });
 
+/* Tap-vs-drag on canvas: only open panels on genuine short taps */
+let _cpx, _cpy, _cpt;
 canvas.addEventListener('pointerdown', (ev) => {
+  _cpx = ev.clientX; _cpy = ev.clientY; _cpt = performance.now();
+});
+canvas.addEventListener('pointerup', (ev) => {
   if (!hoveredObj) return;
+  const dx = ev.clientX - _cpx, dy = ev.clientY - _cpy;
+  if (Math.hypot(dx, dy) > 10 || performance.now() - _cpt > 350) return; // was a drag
   const ud = hoveredObj.userData;
   if (ud.node) {
     showNodePanel(ud.node);
@@ -1008,6 +1024,15 @@ const panelEl = document.getElementById('detail-panel');
 const panelTitle = document.getElementById('panel-title');
 const panelBody = document.getElementById('panel-body');
 
+/* ── Isolate panel touches from canvas/OrbitControls ── */
+panelEl.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+panelEl.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
+panelEl.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
+panelEl.addEventListener('pointerdown', (e) => e.stopPropagation());
+panelEl.addEventListener('pointermove', (e) => e.stopPropagation());
+panelEl.addEventListener('pointerup', (e) => e.stopPropagation());
+panelEl.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });
+
 function getNodeRole(pushCount, pullCount, mixCount, outgoing) {
   const outPos = outgoing.filter(e => e.type === 'positive').length;
   const outNeg = outgoing.filter(e => e.type === 'negative').length;
@@ -1191,6 +1216,17 @@ animate();
 /* ═══════════════════════════════════════════════
    EVENT WIRING
    ═══════════════════════════════════════════════ */
+/* Isolate header + scenario bar touches from canvas */
+[document.querySelector('header'), document.getElementById('scenario-bar')].forEach(el => {
+  if (!el) return;
+  el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+  el.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
+  el.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
+  el.addEventListener('pointerdown', (e) => e.stopPropagation());
+  el.addEventListener('pointermove', (e) => e.stopPropagation());
+  el.addEventListener('pointerup', (e) => e.stopPropagation());
+});
+
 document.querySelectorAll('.scenario-btn').forEach(b => {
   b.addEventListener('click', () => {
     document.getElementById('btn-ammonia').classList.remove('active');
