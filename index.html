@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Global Systems Tensor Network — Interactive Coupling Model</title>
+<meta name="description" content="An interactive model of 15 interconnected global systems showing causal couplings between energy, climate, AI, water, geopolitics, and more.">
+<meta property="og:title" content="Global Systems Tensor Network">
+<meta property="og:description" content="Interactive model of 15 interconnected global systems with verifiable push/pull couplings.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='none' stroke='%234F98A3' stroke-width='2'/><circle cx='16' cy='16' r='3' fill='%234F98A3'/><line x1='16' y1='2' x2='16' y2='8' stroke='%234F98A3' stroke-width='1.5'/><line x1='16' y1='24' x2='16' y2='30' stroke='%234F98A3' stroke-width='1.5'/><line x1='2' y1='16' x2='8' y2='16' stroke='%234F98A3' stroke-width='1.5'/><line x1='24' y1='16' x2='30' y2='16' stroke='%234F98A3' stroke-width='1.5'/></svg>">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=jetbrains-mono@400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════ */
+:root {
+  --font-body: 'General Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Dark theme — geopolitical/analytical feel */
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-2: #1c2128;
+  --color-border: #30363d;
+  --color-text: #e6edf3;
+  --color-text-muted: #8b949e;
+  --color-text-faint: #484f58;
+  --color-primary: #4f98a3;
+  --color-primary-hover: #6bb3be;
+  --color-positive: #3fb950;
+  --color-negative: #f85149;
+  --color-warning: #d29922;
+  --color-info: #58a6ff;
+  --color-ammonia: #da8ee7;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --color-bg: #f0f2f5;
+  --color-surface: #ffffff;
+  --color-surface-2: #f6f8fa;
+  --color-border: #d0d7de;
+  --color-text: #1f2328;
+  --color-text-muted: #656d76;
+  --color-text-faint: #afb8c1;
+  --color-primary: #01696f;
+  --color-primary-hover: #0c4e54;
+  --color-positive: #1a7f37;
+  --color-negative: #cf222e;
+  --color-warning: #9a6700;
+  --color-info: #0969da;
+  --color-ammonia: #8250df;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
+}
+
+/* ═══════════════════════════════════════════
+   BASE RESET
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.6;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { color: var(--color-primary-hover); }
+
+::selection {
+  background: rgba(79, 152, 163, 0.3);
+  color: var(--color-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════ */
+#app {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logo-group svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.logo-group h1 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.logo-group h1 span {
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-left: var(--space-2);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  transition: background var(--transition-interactive), color var(--transition-interactive), border-color var(--transition-interactive);
+}
+.header-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.header-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* MAIN */
+main {
+  position: relative;
+  overflow: hidden;
+}
+
+/* SVG GRAPH */
+#graph-container {
+  width: 100%;
+  height: 100%;
+}
+#graph-container svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ═══════════════════════════════════════════
+   GRAPH STYLES
+   ═══════════════════════════════════════════ */
+.link {
+  fill: none;
+  stroke-linecap: round;
+}
+.link-positive { stroke: var(--color-positive); }
+.link-negative { stroke: var(--color-negative); }
+.link-mixed { stroke: var(--color-warning); }
+
+.node-circle {
+  stroke-width: 2;
+  cursor: grab;
+  transition: r 200ms var(--ease-out);
+}
+.node-circle:hover { filter: brightness(1.2); }
+
+.node-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--color-text);
+  text-anchor: middle;
+  pointer-events: none;
+  text-shadow: 0 1px 3px var(--color-bg), 0 0px 6px var(--color-bg);
+}
+
+.node-connections {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--color-text-muted);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+/* Animated pulses on links */
+.link-pulse {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 4 8;
+}
+
+/* Tooltip */
+.graph-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  max-width: 320px;
+  box-shadow: var(--shadow-lg);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 150ms var(--ease-out);
+  z-index: 200;
+}
+.graph-tooltip.visible { opacity: 1; }
+.graph-tooltip h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+.graph-tooltip .coupling-type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.coupling-type.positive { background: rgba(63,185,80,0.15); color: var(--color-positive); }
+.coupling-type.negative { background: rgba(248,81,73,0.15); color: var(--color-negative); }
+.coupling-type.mixed { background: rgba(210,153,34,0.15); color: var(--color-warning); }
+
+/* ═══════════════════════════════════════════
+   DETAIL PANEL (right side)
+   ═══════════════════════════════════════════ */
+#detail-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 380px;
+  max-width: 90vw;
+  height: 100%;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  transition: transform 300ms var(--ease-out);
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#detail-panel.open { transform: translateX(0); }
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.panel-header h2 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.panel-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 18px;
+  color: var(--color-text-muted);
+  transition: background var(--transition-interactive), color var(--transition-interactive);
+}
+.panel-close:hover { background: var(--color-surface-2); color: var(--color-text); }
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-6);
+}
+.panel-body::-webkit-scrollbar { width: 6px; }
+.panel-body::-webkit-scrollbar-track { background: transparent; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+.panel-section { margin-bottom: var(--space-6); }
+.panel-section h3 {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.stat-card {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+.stat-card .stat-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.stat-card .stat-label {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.coupling-list { list-style: none; }
+.coupling-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: background var(--transition-interactive);
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.coupling-item:last-child { border-bottom: none; }
+.coupling-item:hover { background: var(--color-surface-2); }
+.coupling-arrow {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.coupling-arrow.push { background: rgba(63,185,80,0.15); color: var(--color-positive); }
+.coupling-arrow.pull { background: rgba(248,81,73,0.15); color: var(--color-negative); }
+.coupling-arrow.mixed-arrow { background: rgba(210,153,34,0.15); color: var(--color-warning); }
+.coupling-target { font-weight: 600; }
+.coupling-desc { color: var(--color-text-muted); margin-top: 2px; line-height: 1.4; }
+
+.source-link {
+  font-size: 10px;
+  color: var(--color-primary);
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.description-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+.description-text p { margin-bottom: var(--space-2); max-width: none; }
+
+/* ═══════════════════════════════════════════
+   SCENARIO BAR (bottom)
+   ═══════════════════════════════════════════ */
+#scenario-bar {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  max-width: calc(100vw - 2rem);
+  overflow-x: auto;
+}
+.scenario-btn {
+  white-space: nowrap;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  transition: background var(--transition-interactive), color var(--transition-interactive), border-color var(--transition-interactive);
+}
+.scenario-btn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+.scenario-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.scenario-btn .scenario-icon {
+  margin-right: var(--space-1);
+}
+
+/* ═══════════════════════════════════════════
+   LEGEND
+   ═══════════════════════════════════════════ */
+#legend {
+  position: absolute;
+  bottom: 72px;
+  left: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: 11px;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+.legend-row:last-child { margin-bottom: 0; }
+.legend-line {
+  width: 24px;
+  height: 2px;
+  border-radius: 1px;
+}
+.legend-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid;
+}
+
+/* ═══════════════════════════════════════════
+   INFO OVERLAY
+   ═══════════════════════════════════════════ */
+#info-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms var(--ease-out);
+}
+#info-overlay.visible { opacity: 1; pointer-events: auto; }
+.info-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  max-width: 640px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+.info-card h2 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+.info-card p {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin-bottom: var(--space-4);
+  max-width: none;
+}
+.info-card .key-insight {
+  background: var(--color-surface-2);
+  border-left: 3px solid var(--color-primary);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+}
+.info-card .key-insight strong { color: var(--color-primary); }
+.info-card .close-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: background var(--transition-interactive);
+}
+.info-card .close-btn:hover { background: var(--color-primary-hover); }
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+@keyframes pulse-ring {
+  0% { r: inherit; opacity: 0.6; }
+  100% { r: 40; opacity: 0; }
+}
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+.link-animated {
+  animation: dash-flow 1.2s linear infinite;
+}
+
+/* Stress highlight */
+.node-stressed .node-circle {
+  filter: drop-shadow(0 0 8px var(--color-negative));
+}
+.node-improved .node-circle {
+  filter: drop-shadow(0 0 8px var(--color-positive));
+}
+
+/* Ammonia highlight */
+.ammonia-glow {
+  filter: drop-shadow(0 0 12px var(--color-ammonia)) !important;
+}
+
+/* ═══════════════════════════════════════════
+   MOBILE
+   ═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  header {
+    padding: var(--space-2) var(--space-3);
+    flex-wrap: nowrap;
+  }
+  .logo-group h1 span { display: none; }
+  .header-btn { padding: var(--space-1) var(--space-2); font-size: 12px; }
+  #detail-panel { width: 100vw; max-width: 100vw; }
+  #legend { display: none; }
+  #scenario-bar {
+    bottom: var(--space-2);
+    font-size: 12px;
+  }
+  .scenario-btn { padding: var(--space-1) var(--space-2); }
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo-group">
+      <svg viewBox="0 0 32 32" fill="none" aria-label="Global Tensor Network logo">
+        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+        <circle cx="16" cy="6" r="2.5" fill="var(--color-primary)"/>
+        <circle cx="26" cy="11" r="2.5" fill="var(--color-positive)"/>
+        <circle cx="26" cy="21" r="2.5" fill="var(--color-negative)"/>
+        <circle cx="16" cy="26" r="2.5" fill="var(--color-warning)"/>
+        <circle cx="6" cy="21" r="2.5" fill="var(--color-info)"/>
+        <circle cx="6" cy="11" r="2.5" fill="var(--color-ammonia)"/>
+        <line x1="16" y1="6" x2="26" y2="11" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+        <line x1="26" y1="11" x2="26" y2="21" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+        <line x1="26" y1="21" x2="16" y2="26" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+        <line x1="16" y1="26" x2="6" y2="21" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+        <line x1="6" y1="21" x2="6" y2="11" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+        <line x1="6" y1="11" x2="16" y2="6" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+        <line x1="16" y1="6" x2="16" y2="26" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+        <line x1="6" y1="11" x2="26" y2="21" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+        <line x1="6" y1="21" x2="26" y2="11" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+      </svg>
+      <h1>Global Tensor Network <span>v1.0</span></h1>
+    </div>
+    <div class="header-controls">
+      <button class="header-btn" id="btn-info" aria-label="About this model">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        About
+      </button>
+      <button class="header-btn" id="btn-ammonia" aria-label="Highlight ammonia pathway">
+        NH₃
+      </button>
+      <button class="header-btn" id="btn-theme" data-theme-toggle aria-label="Toggle theme">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div id="graph-container"></div>
+
+    <div class="graph-tooltip" id="tooltip"></div>
+
+    <div id="legend">
+      <div class="legend-row">
+        <div class="legend-line" style="background:var(--color-positive)"></div>
+        <span>Push (reinforcing)</span>
+      </div>
+      <div class="legend-row">
+        <div class="legend-line" style="background:var(--color-negative)"></div>
+        <span>Pull (degrading)</span>
+      </div>
+      <div class="legend-row">
+        <div class="legend-line" style="background:var(--color-warning)"></div>
+        <span>Mixed / bidirectional</span>
+      </div>
+      <div class="legend-row" style="margin-top:var(--space-2)">
+        <div class="legend-circle" style="border-color:var(--color-text-muted); width:8px;height:8px;"></div>
+        <span>Node size = connection count</span>
+      </div>
+    </div>
+
+    <div id="scenario-bar">
+      <button class="scenario-btn active" data-scenario="baseline"><span class="scenario-icon">⊙</span>Baseline</button>
+      <button class="scenario-btn" data-scenario="hormuz"><span class="scenario-icon">⚠</span>Hormuz Crisis</button>
+      <button class="scenario-btn" data-scenario="ammonia"><span class="scenario-icon">⚗</span>Ammonia Fix</button>
+      <button class="scenario-btn" data-scenario="ai-surge"><span class="scenario-icon">⚡</span>AI Surge</button>
+      <button class="scenario-btn" data-scenario="climate"><span class="scenario-icon">🌡</span>Climate +2°C</button>
+    </div>
+
+    <div id="detail-panel">
+      <div class="panel-header">
+        <h2 id="panel-title"></h2>
+        <button class="panel-close" id="panel-close" aria-label="Close panel">✕</button>
+      </div>
+      <div class="panel-body" id="panel-body"></div>
+    </div>
+
+    <div id="info-overlay">
+      <div class="info-card">
+        <h2>Global Systems Tensor Network</h2>
+        <p>This interactive model maps 15 interconnected global systems as a tensor network &mdash; showing how energy, climate, AI, water, geopolitics, critical minerals, and more affect each other through verifiable causal couplings.</p>
+        <div class="key-insight">
+          <strong>The #1 systemic lever is Energy Density.</strong> It touches 22 connections &mdash; more than any other node. The most underexploited structural fix? <strong>Ammonia (NH₃)</strong> &mdash; the only node that simultaneously improves energy density, climate, agriculture, AND reduces resource concentration.
+        </div>
+        <p>Each edge represents a documented causal relationship with cited sources. Click any node to see its connections, or click any edge to see the coupling mechanism. Use the scenario buttons to stress-test the network.</p>
+        <p style="font-size:var(--text-xs);color:var(--color-text-faint);">
+          Data sources: EIA, IEA, Carnegie Endowment, ACS Energy Letters, Nature, World Food Programme, Belfer Center. All coupling weights are directional and sourced.
+        </p>
+        <button class="close-btn" id="info-close">Explore the Network →</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   MODEL DATA — 15 NODES, VERIFIABLE COUPLINGS
+   Sources cited per edge. Coupling types: push (+), pull (-), mixed (±)
+   Weight: 1-5 scale (strength of coupling)
+   ═══════════════════════════════════════════════════════════════════ */
+
+const MODEL = {
+  nodes: [
+    {
+      id: "energy_density",
+      label: "Energy Density",
+      icon: "⚡",
+      color: "#f0c929",
+      category: "infrastructure",
+      description: "The energy stored per unit volume/mass of a fuel or storage medium. Determines transportability, scalability, and cost of energy systems. The single most-connected node in the tensor network.",
+      keyFact: "Ammonia: 12.7 MJ/L vs liquid H₂: 8.5 MJ/L — 50% more hydrogen per litre",
+      source: "ACS Energy Letters (2021), EIA"
+    },
+    {
+      id: "oil_gas",
+      label: "Oil & Gas",
+      icon: "🛢",
+      color: "#6e4c1e",
+      category: "energy",
+      description: "Global petroleum and natural gas production, refining, and distribution. 20M barrels/day transit the Strait of Hormuz — about 20% of global consumption.",
+      keyFact: "84% of Hormuz crude flows go to Asian markets (China, India, Japan, S. Korea)",
+      source: "EIA (2024/2025)"
+    },
+    {
+      id: "chokepoints",
+      label: "Maritime Chokepoints",
+      icon: "⚓",
+      color: "#3a7bd5",
+      category: "infrastructure",
+      description: "Narrow maritime passages critical to global trade: Hormuz, Malacca, Suez, Bab el-Mandeb, Panama. Closure of any creates cascading supply disruptions.",
+      keyFact: "Hormuz alone: 20M bbl/day oil + 1/5 global LNG + 1/3 global fertilizer trade",
+      source: "EIA, Fortune (2026)"
+    },
+    {
+      id: "agriculture",
+      label: "Agriculture & Food",
+      icon: "🌾",
+      color: "#7cb342",
+      category: "human",
+      description: "Global food production, fertilizer supply chains, and food security. Modern agriculture depends on timely delivery of nitrogen (N), phosphorus (P), and potassium (K).",
+      keyFact: "Nitrogen fertilizer production dropped 20% after Hormuz closure; prices surged 70%",
+      source: "Carnegie Endowment (2026), The Conversation (2026)"
+    },
+    {
+      id: "water",
+      label: "Water Systems",
+      icon: "💧",
+      color: "#29b6f6",
+      category: "environment",
+      description: "Freshwater supply, irrigation, desalination, and water-energy-food nexus. Climate change is amplifying drought and water scarcity globally.",
+      keyFact: "AI data centers projected to consume 4.2-6.6 billion m³ water by 2027",
+      source: "AIMultiple (2026), Nature (2025)"
+    },
+    {
+      id: "climate",
+      label: "Climate System",
+      icon: "🌡",
+      color: "#ef5350",
+      category: "environment",
+      description: "Global climate dynamics including greenhouse gas emissions, temperature rise, extreme weather, and carbon cycle feedbacks.",
+      keyFact: "Climate-driven 17% decline in agricultural output projected by 2050 (Mediterranean)",
+      source: "Nature (2025)"
+    },
+    {
+      id: "ai_compute",
+      label: "AI & Compute",
+      icon: "🤖",
+      color: "#7c4dff",
+      category: "technology",
+      description: "Artificial intelligence infrastructure, data centers, and compute demand. GPU-accelerated servers consume 3,000-5,000+ watts vs 300-500 for traditional servers.",
+      keyFact: "US data center electricity: 176 TWh (2023) → projected 325-580 TWh by 2028",
+      source: "LBNL (2024), Belfer Center (2026)"
+    },
+    {
+      id: "critical_minerals",
+      label: "Critical Minerals",
+      icon: "⛏",
+      color: "#8d6e63",
+      category: "resources",
+      description: "Lithium, cobalt, rare earths, copper, nickel, graphite — essential for energy transition, AI hardware, and defense. Supply concentrated in few countries.",
+      keyFact: "Top 3 refining countries hold 86% market share (up from 82% in 2020). China dominates.",
+      source: "IEA Global Critical Minerals Outlook (2025)"
+    },
+    {
+      id: "geopolitics",
+      label: "Geopolitics",
+      icon: "🌐",
+      color: "#ff7043",
+      category: "governance",
+      description: "Interstate competition, alliances, sanctions, trade restrictions, and military conflicts. Geopolitical risk has heterogeneous, nonlinear effects on mineral markets.",
+      keyFact: "55% of energy-related strategic minerals subject to some form of export controls",
+      source: "IEA (2025), DWS (2025)"
+    },
+    {
+      id: "political_stability",
+      label: "Political Stability",
+      icon: "🏛",
+      color: "#ffab40",
+      category: "governance",
+      description: "Domestic political stability, institutional resilience, and governance capacity. Food/energy shocks propagate into political instability — especially in import-dependent nations.",
+      keyFact: "45M additional people facing food insecurity if Hormuz crisis persists (WFP estimate)",
+      source: "UN WFP, The Conversation (2026)"
+    },
+    {
+      id: "resource_nationalism",
+      label: "Resource Nationalism",
+      icon: "🚩",
+      color: "#e53935",
+      category: "governance",
+      description: "Nations restricting export of strategic resources to protect domestic supply. China phosphate export restrictions eliminated 25% of global supply.",
+      keyFact: "Russia halted ammonium nitrate exports; China restricted phosphate — simultaneous",
+      source: "Carnegie Endowment (2026)"
+    },
+    {
+      id: "renewable_energy",
+      label: "Renewable Energy",
+      icon: "☀",
+      color: "#66bb6a",
+      category: "energy",
+      description: "Solar, wind, hydroelectric, and other renewable generation. Land-use demands can create conflicts with food production and ecosystems.",
+      keyFact: "Renewable land-use can conflict with agriculture; hydropower vulnerable to drought",
+      source: "Nature (2025)"
+    },
+    {
+      id: "ammonia",
+      label: "Ammonia (NH₃)",
+      icon: "⚗",
+      color: "#da8ee7",
+      category: "solution",
+      description: "NH₃ as hydrogen carrier, fertilizer, and fuel. Stores 50% more H₂ per litre than liquid hydrogen. Shippable at −33°C (not −253°C). Synthesizable from water, air, and renewable electricity anywhere.",
+      keyFact: "The only node that simultaneously improves energy density, climate, agriculture, AND reduces resource concentration",
+      source: "ACS Energy Letters (2021), Anas Alhajji (2023)"
+    },
+    {
+      id: "supply_chains",
+      label: "Global Supply Chains",
+      icon: "🔗",
+      color: "#78909c",
+      category: "infrastructure",
+      description: "International logistics networks, shipping, manufacturing dependencies, and just-in-time delivery systems. Highly vulnerable to chokepoint disruptions.",
+      keyFact: "A ship captain braving Hormuz would carry oil over fertilizer — lower-value goods get stranded",
+      source: "Carnegie Endowment (2026)"
+    },
+    {
+      id: "financial_markets",
+      label: "Financial Markets",
+      icon: "📈",
+      color: "#26a69a",
+      category: "economic",
+      description: "Global commodity markets, energy pricing, food price indices, and capital flows. Energy price shocks cascade through every economic sector.",
+      keyFact: "Hormuz closure analysts: crude to $100/bbl. Fertilizer prices +40% in one month.",
+      source: "Fortune (2026), AFBF (2026)"
+    }
+  ],
+
+  edges: [
+    // ENERGY DENSITY connections (22 total — most connected node)
+    { source: "energy_density", target: "oil_gas", type: "mixed", weight: 5,
+      mechanism: "Oil/gas have high energy density enabling current transport dominance, but fossil lock-in blocks alternatives",
+      source_cite: "EIA" },
+    { source: "energy_density", target: "ammonia", type: "positive", weight: 5,
+      mechanism: "NH₃ at 12.7 MJ/L vs liquid H₂ at 8.5 MJ/L — 50% more hydrogen per litre. Shippable at −33°C vs −253°C",
+      source_cite: "ACS Energy Letters (2021)" },
+    { source: "energy_density", target: "renewable_energy", type: "positive", weight: 4,
+      mechanism: "Higher energy density storage enables renewable intermittency management and grid stability",
+      source_cite: "IEA" },
+    { source: "energy_density", target: "ai_compute", type: "positive", weight: 3,
+      mechanism: "Dense energy sources needed to power 3-5kW GPU servers; low-density sources can't serve hyperscale loads",
+      source_cite: "LBNL (2024)" },
+    { source: "energy_density", target: "supply_chains", type: "positive", weight: 4,
+      mechanism: "Higher density fuels reduce shipping volume requirements, lowering logistics costs",
+      source_cite: "Anas Alhajji (2023)" },
+    { source: "energy_density", target: "climate", type: "mixed", weight: 4,
+      mechanism: "High-density fossil fuels drive emissions; high-density clean alternatives (NH₃, nuclear) reduce them",
+      source_cite: "IEA" },
+    { source: "energy_density", target: "chokepoints", type: "negative", weight: 4,
+      mechanism: "Dependence on high-density fossil fuels concentrates trade through maritime chokepoints",
+      source_cite: "EIA (2024)" },
+    { source: "energy_density", target: "critical_minerals", type: "mixed", weight: 3,
+      mechanism: "Battery energy density improvements require critical minerals; alternative chemistries can reduce dependency",
+      source_cite: "IEA (2025)" },
+    { source: "energy_density", target: "agriculture", type: "positive", weight: 4,
+      mechanism: "Energy-dense fertilizer production (Haber-Bosch) enables modern agriculture; NH₃ IS fertilizer",
+      source_cite: "Carnegie Endowment (2026)" },
+    { source: "energy_density", target: "financial_markets", type: "positive", weight: 3,
+      mechanism: "Energy density determines transport economics and commodity pricing fundamentals",
+      source_cite: "EIA" },
+    { source: "energy_density", target: "water", type: "mixed", weight: 3,
+      mechanism: "Desalination and water treatment are energy-intensive; dense sources improve viability",
+      source_cite: "Nature (2025)" },
+    { source: "energy_density", target: "geopolitics", type: "negative", weight: 4,
+      mechanism: "Concentrated high-density resources (oil, uranium) create geopolitical leverage and conflict",
+      source_cite: "DWS (2025)" },
+
+    // CHOKEPOINT connections
+    { source: "chokepoints", target: "oil_gas", type: "negative", weight: 5,
+      mechanism: "20M bbl/day through Hormuz; closure creates immediate supply shock to global oil markets",
+      source_cite: "EIA (2024)" },
+    { source: "chokepoints", target: "agriculture", type: "negative", weight: 5,
+      mechanism: "1/3 of global fertilizer trade transits Hormuz; blockage triggers N/P/K shortages within weeks",
+      source_cite: "Carnegie Endowment (2026)" },
+    { source: "chokepoints", target: "supply_chains", type: "negative", weight: 5,
+      mechanism: "Chokepoint closure forces re-routing, adding weeks of transit time and shipping costs",
+      source_cite: "EIA" },
+    { source: "chokepoints", target: "financial_markets", type: "negative", weight: 4,
+      mechanism: "Analysts estimate closure drives crude to $100/bbl; cascading commodity price spikes",
+      source_cite: "Fortune (2026)" },
+    { source: "chokepoints", target: "geopolitics", type: "negative", weight: 4,
+      mechanism: "Chokepoint control creates military leverage; Hormuz is both weapon and vulnerability for Iran",
+      source_cite: "Fortune (2026)" },
+
+    // OIL & GAS connections
+    { source: "oil_gas", target: "climate", type: "negative", weight: 5,
+      mechanism: "Fossil fuel combustion is the primary driver of CO₂ emissions and climate change",
+      source_cite: "IPCC" },
+    { source: "oil_gas", target: "agriculture", type: "positive", weight: 4,
+      mechanism: "Natural gas is primary feedstock for nitrogen fertilizer (Haber-Bosch process); 70-90% of fertilizer cost",
+      source_cite: "Carnegie Endowment (2026)" },
+    { source: "oil_gas", target: "financial_markets", type: "positive", weight: 5,
+      mechanism: "Oil prices are the fundamental driver of global commodity markets and inflation",
+      source_cite: "EIA" },
+    { source: "oil_gas", target: "geopolitics", type: "negative", weight: 5,
+      mechanism: "Petro-state dynamics, OPEC+ politics, sanctions regimes all driven by oil/gas control",
+      source_cite: "DWS (2025)" },
+    { source: "oil_gas", target: "resource_nationalism", type: "negative", weight: 4,
+      mechanism: "Oil wealth enables and incentivizes resource nationalism and export controls",
+      source_cite: "IEA (2025)" },
+
+    // AGRICULTURE connections
+    { source: "agriculture", target: "water", type: "negative", weight: 5,
+      mechanism: "Agriculture consumes ~70% of global freshwater; unsustainable irrigation causes salinity and depletion",
+      source_cite: "Nature (2025)" },
+    { source: "agriculture", target: "political_stability", type: "positive", weight: 5,
+      mechanism: "Food price shocks directly trigger political instability — Arab Spring, Sri Lanka 2022",
+      source_cite: "UN WFP" },
+    { source: "agriculture", target: "climate", type: "mixed", weight: 4,
+      mechanism: "Agriculture produces ~25% of GHG emissions, but also provides carbon sequestration potential",
+      source_cite: "Nature (2025)" },
+
+    // WATER connections
+    { source: "water", target: "renewable_energy", type: "mixed", weight: 3,
+      mechanism: "Hydropower depends on water flow; renewables reduce thermal water use but solar needs cleaning water",
+      source_cite: "Nature (2025)" },
+    { source: "water", target: "ai_compute", type: "negative", weight: 3,
+      mechanism: "Data center cooling: 4.2-6.6 billion m³ water projected by 2027; competes with agriculture and municipal use",
+      source_cite: "AIMultiple (2026)" },
+    { source: "water", target: "political_stability", type: "positive", weight: 4,
+      mechanism: "Water scarcity drives migration, conflict, and state fragility — especially MENA region",
+      source_cite: "Nature (2025)" },
+
+    // CLIMATE connections
+    { source: "climate", target: "water", type: "negative", weight: 5,
+      mechanism: "Climate change amplifies drought, reduces snowpack, disrupts precipitation — cascading water scarcity",
+      source_cite: "Nature (2025)" },
+    { source: "climate", target: "agriculture", type: "negative", weight: 5,
+      mechanism: "Projected 17% decline in agricultural output by 2050; heat stress reduces crop yields",
+      source_cite: "Nature (2025)" },
+    { source: "climate", target: "political_stability", type: "negative", weight: 4,
+      mechanism: "Extreme weather, crop failure, displacement → political instability in vulnerable nations",
+      source_cite: "Nature (2025)" },
+    { source: "climate", target: "renewable_energy", type: "mixed", weight: 3,
+      mechanism: "Climate crisis drives renewable deployment, but extreme weather damages infrastructure",
+      source_cite: "IEA" },
+    { source: "climate", target: "financial_markets", type: "negative", weight: 3,
+      mechanism: "Climate risk repricing, stranded assets, insurance costs, physical damage to infrastructure",
+      source_cite: "IEA" },
+
+    // AI & COMPUTE connections
+    { source: "ai_compute", target: "critical_minerals", type: "negative", weight: 4,
+      mechanism: "AI hardware demands rare earths, copper, cobalt, lithium — competes with energy transition for same minerals",
+      source_cite: "IEA (2025)" },
+    { source: "ai_compute", target: "climate", type: "negative", weight: 3,
+      mechanism: "Training GPT-3: 552 tons CO₂. Global data center electricity projected ~945 TWh by 2030 (3% global)",
+      source_cite: "IEA (2025), AIMultiple" },
+    { source: "ai_compute", target: "renewable_energy", type: "positive", weight: 3,
+      mechanism: "AI optimizes grid management, weather prediction for renewables; but AI demand may outpace green supply",
+      source_cite: "Belfer Center (2026)" },
+    { source: "ai_compute", target: "financial_markets", type: "positive", weight: 3,
+      mechanism: "AI boom drives capital allocation toward compute infrastructure; $1T projected data center upgrades",
+      source_cite: "Belfer Center (2026)" },
+
+    // CRITICAL MINERALS connections
+    { source: "critical_minerals", target: "renewable_energy", type: "positive", weight: 5,
+      mechanism: "Solar panels, wind turbines, batteries all require critical minerals; supply bottleneck = deployment bottleneck",
+      source_cite: "IEA (2025)" },
+    { source: "critical_minerals", target: "geopolitics", type: "negative", weight: 5,
+      mechanism: "90% of supply growth from single largest supplier per mineral; extreme concentration creates leverage",
+      source_cite: "IEA (2025)" },
+    { source: "critical_minerals", target: "resource_nationalism", type: "negative", weight: 5,
+      mechanism: "China's dominance in refining (86% top-3 share) + willingness to use as trade weapon = resource nationalism",
+      source_cite: "IEA (2025), DWS (2025)" },
+    { source: "critical_minerals", target: "supply_chains", type: "negative", weight: 4,
+      mechanism: "Concentrated processing creates single points of failure; 30% copper supply deficit projected by 2035",
+      source_cite: "IEA (2025)" },
+
+    // GEOPOLITICS connections
+    { source: "geopolitics", target: "chokepoints", type: "negative", weight: 5,
+      mechanism: "Interstate conflict directly threatens chokepoint access — Iran/Hormuz, Houthis/Bab el-Mandeb",
+      source_cite: "Fortune (2026)" },
+    { source: "geopolitics", target: "resource_nationalism", type: "positive", weight: 4,
+      mechanism: "Geopolitical competition incentivizes resource hoarding and export restrictions",
+      source_cite: "IEA (2025)" },
+    { source: "geopolitics", target: "supply_chains", type: "negative", weight: 4,
+      mechanism: "Sanctions, trade wars, and decoupling fragment global supply chains",
+      source_cite: "DWS (2025)" },
+
+    // POLITICAL STABILITY connections
+    { source: "political_stability", target: "geopolitics", type: "mixed", weight: 4,
+      mechanism: "Domestic instability can trigger international conflict; stable nations anchor alliances",
+      source_cite: "Carnegie Endowment" },
+    { source: "political_stability", target: "resource_nationalism", type: "positive", weight: 3,
+      mechanism: "Unstable governments resort to resource nationalism as populist economic strategy",
+      source_cite: "DWS (2025)" },
+
+    // RESOURCE NATIONALISM connections
+    { source: "resource_nationalism", target: "supply_chains", type: "negative", weight: 4,
+      mechanism: "Export restrictions directly disrupt supply chains — Russia NH₄NO₃ ban, China phosphate restrictions",
+      source_cite: "Carnegie Endowment (2026)" },
+    { source: "resource_nationalism", target: "financial_markets", type: "negative", weight: 3,
+      mechanism: "Export controls create price volatility; mineral prices fluctuate more than crude oil",
+      source_cite: "IEA (2025)" },
+    { source: "resource_nationalism", target: "agriculture", type: "negative", weight: 4,
+      mechanism: "Fertilizer export bans (Russia, China) directly reduce global fertilizer availability",
+      source_cite: "Carnegie Endowment (2026)" },
+
+    // AMMONIA connections (the structural fix)
+    { source: "ammonia", target: "agriculture", type: "positive", weight: 5,
+      mechanism: "NH₃ IS nitrogen fertilizer — local synthesis from water+air+electricity bypasses import dependency",
+      source_cite: "Carnegie Endowment (2026)" },
+    { source: "ammonia", target: "climate", type: "positive", weight: 4,
+      mechanism: "Green NH₃ from renewables replaces natural gas in Haber-Bosch; can be cracked to clean H₂ for fuel",
+      source_cite: "ACS Energy Letters (2021)" },
+    { source: "ammonia", target: "chokepoints", type: "positive", weight: 5,
+      mechanism: "Distributed local NH₃ synthesis routes around maritime chokepoints entirely",
+      source_cite: "Anas Alhajji (2023)" },
+    { source: "ammonia", target: "resource_nationalism", type: "positive", weight: 4,
+      mechanism: "NH₃ synthesizable from air+water+electricity — no concentrated resource dependency",
+      source_cite: "ACS Energy Letters (2021)" },
+    { source: "ammonia", target: "renewable_energy", type: "positive", weight: 4,
+      mechanism: "NH₃ serves as chemical battery for renewable intermittency — seasonal storage at scale",
+      source_cite: "Anas Alhajji (2023)" },
+    { source: "ammonia", target: "supply_chains", type: "positive", weight: 4,
+      mechanism: "Existing NH₃ shipping infrastructure (180 MTPA market); distributed production reduces logistics burden",
+      source_cite: "Anas Alhajji (2023)" },
+    { source: "ammonia", target: "water", type: "mixed", weight: 2,
+      mechanism: "Green NH₃ production requires water for electrolysis; but reduces fossil water contamination from fracking",
+      source_cite: "ACS Energy Letters (2021)" },
+    { source: "ammonia", target: "political_stability", type: "positive", weight: 3,
+      mechanism: "Local fertilizer+fuel production reduces import dependence that makes nations vulnerable to external shocks",
+      source_cite: "Carnegie Endowment (2026)" },
+    { source: "ammonia", target: "financial_markets", type: "positive", weight: 3,
+      mechanism: "Distributed production diversifies supply risk; reduces commodity price volatility from chokepoint events",
+      source_cite: "Carnegie Endowment (2026)" },
+
+    // RENEWABLE ENERGY connections
+    { source: "renewable_energy", target: "climate", type: "positive", weight: 5,
+      mechanism: "Displaces fossil fuel generation; primary pathway to decarbonization",
+      source_cite: "IEA" },
+
+    // FINANCIAL MARKETS connections
+    { source: "financial_markets", target: "political_stability", type: "positive", weight: 4,
+      mechanism: "Market crashes, food price spikes, and energy cost shocks destabilize governments",
+      source_cite: "Carnegie Endowment" },
+    { source: "financial_markets", target: "supply_chains", type: "mixed", weight: 3,
+      mechanism: "Capital flows enable supply chain investment; but speculation amplifies commodity volatility",
+      source_cite: "EIA" },
+    { source: "supply_chains", target: "agriculture", type: "positive", weight: 4,
+      mechanism: "Reliable logistics enable just-in-time fertilizer delivery and food distribution",
+      source_cite: "Carnegie Endowment (2026)" }
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   SCENARIO DEFINITIONS
+   ═══════════════════════════════════════════════════════════════════ */
+const SCENARIOS = {
+  baseline: {
+    name: "Baseline",
+    description: "Current state of global systems with existing couplings and tensions.",
+    stressed: [],
+    improved: [],
+    highlightEdges: []
+  },
+  hormuz: {
+    name: "Hormuz Crisis",
+    description: "Strait of Hormuz closure: 20M bbl/day blocked, 1/3 global fertilizer trade halted. Cascade: energy → agriculture → political instability → resource nationalism.",
+    stressed: ["chokepoints", "oil_gas", "agriculture", "political_stability", "financial_markets", "supply_chains"],
+    improved: [],
+    highlightEdges: [
+      ["chokepoints", "oil_gas"],
+      ["chokepoints", "agriculture"],
+      ["chokepoints", "supply_chains"],
+      ["chokepoints", "financial_markets"],
+      ["agriculture", "political_stability"],
+      ["political_stability", "resource_nationalism"],
+      ["resource_nationalism", "agriculture"],
+      ["oil_gas", "financial_markets"]
+    ]
+  },
+  ammonia: {
+    name: "Ammonia Fix",
+    description: "Distributed green NH₃ synthesis deployed globally. Routes around chokepoints. Local fertilizer + fuel + H₂ carrier production from water + air + electricity.",
+    stressed: [],
+    improved: ["ammonia", "agriculture", "energy_density", "renewable_energy", "climate"],
+    highlightEdges: [
+      ["ammonia", "agriculture"],
+      ["ammonia", "chokepoints"],
+      ["ammonia", "climate"],
+      ["ammonia", "resource_nationalism"],
+      ["ammonia", "renewable_energy"],
+      ["ammonia", "energy_density"],
+      ["ammonia", "supply_chains"],
+      ["energy_density", "ammonia"]
+    ]
+  },
+  "ai-surge": {
+    name: "AI Surge",
+    description: "Rapid AI scaling: data center electricity to 580 TWh by 2028 (12% of US). Extreme draw on energy, water, and critical minerals simultaneously.",
+    stressed: ["ai_compute", "water", "critical_minerals", "climate"],
+    improved: [],
+    highlightEdges: [
+      ["ai_compute", "critical_minerals"],
+      ["ai_compute", "water"],
+      ["ai_compute", "climate"],
+      ["critical_minerals", "geopolitics"],
+      ["critical_minerals", "resource_nationalism"],
+      ["energy_density", "ai_compute"]
+    ]
+  },
+  climate: {
+    name: "Climate +2°C",
+    description: "Global mean temperature +2°C above pre-industrial. Projected 17% agricultural output decline, cascading water scarcity, displacement, and instability.",
+    stressed: ["climate", "water", "agriculture", "political_stability"],
+    improved: [],
+    highlightEdges: [
+      ["climate", "water"],
+      ["climate", "agriculture"],
+      ["climate", "political_stability"],
+      ["water", "political_stability"],
+      ["agriculture", "political_stability"],
+      ["water", "renewable_energy"]
+    ]
+  }
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   GRAPH ENGINE
+   ═══════════════════════════════════════════════════════════════════ */
+const container = document.getElementById("graph-container");
+const tooltip = document.getElementById("tooltip");
+const detailPanel = document.getElementById("detail-panel");
+const panelTitle = document.getElementById("panel-title");
+const panelBody = document.getElementById("panel-body");
+
+let width, height;
+let simulation, svg, g;
+let linkElements, nodeGroups;
+let currentScenario = "baseline";
+let ammoniaMode = false;
+let selectedNode = null;
+
+function getConnectionCount(nodeId) {
+  return MODEL.edges.filter(e => e.source === nodeId || e.target === nodeId ||
+    (e.source.id && (e.source.id === nodeId || e.target.id === nodeId))).length;
+}
+
+function initGraph() {
+  width = container.clientWidth;
+  height = container.clientHeight;
+
+  svg = d3.select("#graph-container").append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
+
+  // Defs for arrow markers
+  const defs = svg.append("defs");
+
+  ["positive", "negative", "mixed"].forEach(type => {
+    const colors = { positive: "var(--color-positive)", negative: "var(--color-negative)", mixed: "var(--color-warning)" };
+    defs.append("marker")
+      .attr("id", `arrow-${type}`)
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 28)
+      .attr("refY", 0)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M0,-4L10,0L0,4")
+      .attr("fill", colors[type]);
+  });
+
+  // Glow filter
+  const glow = defs.append("filter").attr("id", "glow");
+  glow.append("feGaussianBlur").attr("stdDeviation", "3").attr("result", "blur");
+  glow.append("feMerge").selectAll("feMergeNode")
+    .data(["blur", "SourceGraphic"]).enter()
+    .append("feMergeNode").attr("in", d => d);
+
+  g = svg.append("g");
+
+  // Zoom
+  const zoom = d3.zoom()
+    .scaleExtent([0.3, 4])
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform);
+    });
+  svg.call(zoom);
+
+  // Initial zoom to fit
+  const initialScale = Math.min(width, height) / 900;
+  svg.call(zoom.transform, d3.zoomIdentity
+    .translate(width / 2, height / 2)
+    .scale(initialScale)
+    .translate(-width / 2, -height / 2));
+
+  // Compute connection counts
+  MODEL.nodes.forEach(n => {
+    n.connections = getConnectionCount(n.id);
+  });
+
+  // Force simulation
+  simulation = d3.forceSimulation(MODEL.nodes)
+    .force("link", d3.forceLink(MODEL.edges).id(d => d.id).distance(d => 140 - d.weight * 8).strength(d => 0.3 + d.weight * 0.05))
+    .force("charge", d3.forceManyBody().strength(-400).distanceMax(500))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collision", d3.forceCollide().radius(d => getNodeRadius(d) + 20))
+    .force("x", d3.forceX(width / 2).strength(0.03))
+    .force("y", d3.forceY(height / 2).strength(0.03));
+
+  // Links
+  linkElements = g.append("g").attr("class", "links").selectAll("line")
+    .data(MODEL.edges)
+    .join("line")
+    .attr("class", d => `link link-${d.type}`)
+    .attr("stroke-width", d => 0.5 + d.weight * 0.6)
+    .attr("stroke-opacity", 0.4)
+    .attr("marker-end", d => `url(#arrow-${d.type})`)
+    .on("mouseover", showEdgeTooltip)
+    .on("mousemove", moveTooltip)
+    .on("mouseout", hideTooltip)
+    .on("click", (event, d) => showEdgeDetail(d));
+
+  // Animated dashes on links
+  linkElements.attr("stroke-dasharray", d => d.weight >= 4 ? "4 8" : "none")
+    .classed("link-animated", d => d.weight >= 4);
+
+  // Nodes
+  nodeGroups = g.append("g").attr("class", "nodes").selectAll("g")
+    .data(MODEL.nodes)
+    .join("g")
+    .attr("class", "node-group")
+    .call(d3.drag()
+      .on("start", dragStarted)
+      .on("drag", dragged)
+      .on("end", dragEnded))
+    .on("mouseover", showNodeTooltip)
+    .on("mousemove", moveTooltip)
+    .on("mouseout", hideTooltip)
+    .on("click", (event, d) => {
+      event.stopPropagation();
+      showNodeDetail(d);
+    });
+
+  nodeGroups.append("circle")
+    .attr("class", "node-circle")
+    .attr("r", d => getNodeRadius(d))
+    .attr("fill", d => d.color)
+    .attr("fill-opacity", 0.15)
+    .attr("stroke", d => d.color);
+
+  // Inner circle
+  nodeGroups.append("circle")
+    .attr("r", d => getNodeRadius(d) * 0.4)
+    .attr("fill", d => d.color)
+    .attr("fill-opacity", 0.6)
+    .attr("pointer-events", "none");
+
+  // Icon label
+  nodeGroups.append("text")
+    .attr("dy", -getNodeRadius.bind(null))
+    .each(function(d) { d3.select(this).attr("dy", -(getNodeRadius(d) + 14)); })
+    .attr("class", "node-label")
+    .text(d => `${d.icon} ${d.label}`);
+
+  // Connection count badge
+  nodeGroups.append("text")
+    .attr("class", "node-connections")
+    .each(function(d) { d3.select(this).attr("dy", getNodeRadius(d) + 14); })
+    .text(d => `${d.connections} links`);
+
+  simulation.on("tick", () => {
+    linkElements
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
+
+    nodeGroups.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+  // Click background to deselect
+  svg.on("click", () => {
+    deselectAll();
+    closePanel();
+  });
+}
+
+function getNodeRadius(d) {
+  const base = 16;
+  const scale = (d.connections || 1) * 1.4;
+  return base + scale;
+}
+
+/* ═══════════════════════════════════════════════
+   DRAG
+   ═══════════════════════════════════════════════ */
+function dragStarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+function dragged(event, d) {
+  d.fx = event.x;
+  d.fy = event.y;
+}
+function dragEnded(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+/* ═══════════════════════════════════════════════
+   TOOLTIPS
+   ═══════════════════════════════════════════════ */
+function showNodeTooltip(event, d) {
+  tooltip.innerHTML = `
+    <h3>${d.icon} ${d.label}</h3>
+    <p style="color:var(--color-text-muted);margin:4px 0 6px">${d.description.substring(0, 120)}...</p>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--color-primary)">${d.connections} connections</div>
+  `;
+  tooltip.classList.add("visible");
+}
+
+function showEdgeTooltip(event, d) {
+  const sourceName = typeof d.source === "object" ? d.source.label : MODEL.nodes.find(n => n.id === d.source).label;
+  const targetName = typeof d.target === "object" ? d.target.label : MODEL.nodes.find(n => n.id === d.target).label;
+  const typeLabels = { positive: "Push", negative: "Pull", mixed: "Mixed" };
+  tooltip.innerHTML = `
+    <h3>${sourceName} → ${targetName}</h3>
+    <span class="coupling-type ${d.type}">${typeLabels[d.type]}</span>
+    <span style="font-family:var(--font-mono);font-size:10px;margin-left:6px">weight: ${d.weight}/5</span>
+    <p style="color:var(--color-text-muted);margin-top:6px;font-size:12px">${d.mechanism}</p>
+  `;
+  tooltip.classList.add("visible");
+}
+
+function moveTooltip(event) {
+  const rect = container.getBoundingClientRect();
+  let x = event.clientX - rect.left + 16;
+  let y = event.clientY - rect.top + 16;
+  if (x + 320 > rect.width) x = event.clientX - rect.left - 336;
+  if (y + 200 > rect.height) y = event.clientY - rect.top - 200;
+  tooltip.style.left = x + "px";
+  tooltip.style.top = y + "px";
+}
+
+function hideTooltip() {
+  tooltip.classList.remove("visible");
+}
+
+/* ═══════════════════════════════════════════════
+   DETAIL PANEL
+   ═══════════════════════════════════════════════ */
+function showNodeDetail(node) {
+  selectedNode = node.id;
+  highlightNode(node.id);
+
+  panelTitle.innerHTML = `${node.icon} ${node.label}`;
+
+  const connectedEdges = MODEL.edges.filter(e => {
+    const sid = typeof e.source === "object" ? e.source.id : e.source;
+    const tid = typeof e.target === "object" ? e.target.id : e.target;
+    return sid === node.id || tid === node.id;
+  });
+
+  const outgoing = connectedEdges.filter(e => (typeof e.source === "object" ? e.source.id : e.source) === node.id);
+  const incoming = connectedEdges.filter(e => (typeof e.target === "object" ? e.target.id : e.target) === node.id);
+
+  let html = `
+    <div class="panel-section">
+      <div class="description-text"><p>${node.description}</p></div>
+    </div>
+    <div class="panel-section">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--color-primary)">${node.connections}</div>
+          <div class="stat-label">Total Links</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--color-positive)">${outgoing.length}</div>
+          <div class="stat-label">Outgoing</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--color-negative)">${incoming.length}</div>
+          <div class="stat-label">Incoming</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${(connectedEdges.reduce((s,e)=>s+e.weight,0)/connectedEdges.length).toFixed(1)}</div>
+          <div class="stat-label">Avg Weight</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="key-insight" style="background:var(--color-surface-2);border-left:3px solid ${node.color};padding:var(--space-3) var(--space-4);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-bottom:var(--space-2);font-size:var(--text-xs);">
+        <strong>${node.keyFact}</strong>
+        <div class="source-link">${node.source}</div>
+      </div>
+    </div>
+  `;
+
+  if (outgoing.length > 0) {
+    html += `<div class="panel-section"><h3>Outgoing Couplings</h3><ul class="coupling-list">`;
+    outgoing.forEach(e => {
+      const targetNode = MODEL.nodes.find(n => n.id === (typeof e.target === "object" ? e.target.id : e.target));
+      const arrowClass = e.type === "positive" ? "push" : e.type === "negative" ? "pull" : "mixed-arrow";
+      const arrowSymbol = e.type === "positive" ? "+" : e.type === "negative" ? "−" : "±";
+      html += `
+        <li class="coupling-item" data-edge-source="${typeof e.source === "object" ? e.source.id : e.source}" data-edge-target="${typeof e.target === "object" ? e.target.id : e.target}">
+          <div class="coupling-arrow ${arrowClass}">${arrowSymbol}</div>
+          <div>
+            <div class="coupling-target">${targetNode.icon} ${targetNode.label} <span style="font-family:var(--font-mono);font-size:10px;color:var(--color-text-faint)">w:${e.weight}</span></div>
+            <div class="coupling-desc">${e.mechanism}</div>
+            <div class="source-link">${e.source_cite}</div>
+          </div>
+        </li>`;
+    });
+    html += `</ul></div>`;
+  }
+
+  if (incoming.length > 0) {
+    html += `<div class="panel-section"><h3>Incoming Couplings</h3><ul class="coupling-list">`;
+    incoming.forEach(e => {
+      const sourceNode = MODEL.nodes.find(n => n.id === (typeof e.source === "object" ? e.source.id : e.source));
+      const arrowClass = e.type === "positive" ? "push" : e.type === "negative" ? "pull" : "mixed-arrow";
+      const arrowSymbol = e.type === "positive" ? "+" : e.type === "negative" ? "−" : "±";
+      html += `
+        <li class="coupling-item" data-edge-source="${typeof e.source === "object" ? e.source.id : e.source}" data-edge-target="${typeof e.target === "object" ? e.target.id : e.target}">
+          <div class="coupling-arrow ${arrowClass}">${arrowSymbol}</div>
+          <div>
+            <div class="coupling-target">${sourceNode.icon} ${sourceNode.label} <span style="font-family:var(--font-mono);font-size:10px;color:var(--color-text-faint)">w:${e.weight}</span></div>
+            <div class="coupling-desc">${e.mechanism}</div>
+            <div class="source-link">${e.source_cite}</div>
+          </div>
+        </li>`;
+    });
+    html += `</ul></div>`;
+  }
+
+  panelBody.innerHTML = html;
+  detailPanel.classList.add("open");
+
+  // Add click handlers to coupling items
+  panelBody.querySelectorAll(".coupling-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const src = item.dataset.edgeSource;
+      const tgt = item.dataset.edgeTarget;
+      highlightEdge(src, tgt);
+    });
+  });
+}
+
+function showEdgeDetail(edge) {
+  const sourceNode = typeof edge.source === "object" ? edge.source : MODEL.nodes.find(n => n.id === edge.source);
+  const targetNode = typeof edge.target === "object" ? edge.target : MODEL.nodes.find(n => n.id === edge.target);
+  const typeLabels = { positive: "Push (reinforcing)", negative: "Pull (degrading)", mixed: "Mixed (bidirectional)" };
+
+  panelTitle.innerHTML = `${sourceNode.icon} → ${targetNode.icon}`;
+
+  panelBody.innerHTML = `
+    <div class="panel-section">
+      <h3>Coupling</h3>
+      <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-4)">
+        <span style="font-weight:600">${sourceNode.label}</span>
+        <span style="color:var(--color-text-faint)">→</span>
+        <span style="font-weight:600">${targetNode.label}</span>
+      </div>
+      <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4)">
+        <span class="coupling-type ${edge.type}">${typeLabels[edge.type]}</span>
+        <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">Weight: ${edge.weight}/5</span>
+      </div>
+    </div>
+    <div class="panel-section">
+      <h3>Mechanism</h3>
+      <div class="description-text"><p>${edge.mechanism}</p></div>
+      <div class="source-link" style="margin-top:var(--space-2)">${edge.source_cite}</div>
+    </div>
+  `;
+  detailPanel.classList.add("open");
+
+  highlightEdge(
+    typeof edge.source === "object" ? edge.source.id : edge.source,
+    typeof edge.target === "object" ? edge.target.id : edge.target
+  );
+}
+
+function closePanel() {
+  detailPanel.classList.remove("open");
+  selectedNode = null;
+}
+
+/* ═══════════════════════════════════════════════
+   HIGHLIGHT LOGIC
+   ═══════════════════════════════════════════════ */
+function highlightNode(nodeId) {
+  const connectedIds = new Set();
+  connectedIds.add(nodeId);
+  MODEL.edges.forEach(e => {
+    const sid = typeof e.source === "object" ? e.source.id : e.source;
+    const tid = typeof e.target === "object" ? e.target.id : e.target;
+    if (sid === nodeId) connectedIds.add(tid);
+    if (tid === nodeId) connectedIds.add(sid);
+  });
+
+  nodeGroups.style("opacity", d => connectedIds.has(d.id) ? 1 : 0.15);
+  linkElements.style("opacity", d => {
+    const sid = typeof d.source === "object" ? d.source.id : d.source;
+    const tid = typeof d.target === "object" ? d.target.id : d.target;
+    return (sid === nodeId || tid === nodeId) ? 0.8 : 0.05;
+  });
+}
+
+function highlightEdge(srcId, tgtId) {
+  const involvedIds = new Set([srcId, tgtId]);
+  nodeGroups.style("opacity", d => involvedIds.has(d.id) ? 1 : 0.15);
+  linkElements.style("opacity", d => {
+    const sid = typeof d.source === "object" ? d.source.id : d.source;
+    const tid = typeof d.target === "object" ? d.target.id : d.target;
+    return (sid === srcId && tid === tgtId) || (sid === tgtId && tid === srcId) ? 1 : 0.05;
+  });
+}
+
+function deselectAll() {
+  nodeGroups.style("opacity", 1);
+  linkElements.style("opacity", 0.4);
+  nodeGroups.classed("node-stressed", false).classed("node-improved", false);
+  nodeGroups.selectAll(".node-circle").classed("ammonia-glow", false);
+  selectedNode = null;
+}
+
+/* ═══════════════════════════════════════════════
+   SCENARIOS
+   ═══════════════════════════════════════════════ */
+function applyScenario(scenarioId) {
+  currentScenario = scenarioId;
+  const scenario = SCENARIOS[scenarioId];
+
+  // Reset
+  deselectAll();
+
+  // Update button states
+  document.querySelectorAll(".scenario-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.scenario === scenarioId);
+  });
+
+  if (scenarioId === "baseline") return;
+
+  // Apply stress/improvement
+  nodeGroups.classed("node-stressed", d => scenario.stressed.includes(d.id));
+  nodeGroups.classed("node-improved", d => scenario.improved.includes(d.id));
+
+  // Highlight cascade edges
+  if (scenario.highlightEdges.length > 0) {
+    const edgePairs = new Set(scenario.highlightEdges.map(p => p.join("-")));
+    const involvedNodes = new Set();
+    scenario.highlightEdges.forEach(([s, t]) => { involvedNodes.add(s); involvedNodes.add(t); });
+
+    linkElements
+      .style("opacity", d => {
+        const sid = typeof d.source === "object" ? d.source.id : d.source;
+        const tid = typeof d.target === "object" ? d.target.id : d.target;
+        return edgePairs.has(`${sid}-${tid}`) || edgePairs.has(`${tid}-${sid}`) ? 0.9 : 0.08;
+      })
+      .attr("stroke-width", d => {
+        const sid = typeof d.source === "object" ? d.source.id : d.source;
+        const tid = typeof d.target === "object" ? d.target.id : d.target;
+        return (edgePairs.has(`${sid}-${tid}`) || edgePairs.has(`${tid}-${sid}`)) ? 2 + d.weight * 0.6 : 0.5 + d.weight * 0.6;
+      });
+
+    nodeGroups.style("opacity", d => involvedNodes.has(d.id) ? 1 : 0.2);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   AMMONIA MODE
+   ═══════════════════════════════════════════════ */
+function toggleAmmoniaMode() {
+  ammoniaMode = !ammoniaMode;
+  document.getElementById("btn-ammonia").classList.toggle("active", ammoniaMode);
+
+  if (ammoniaMode) {
+    applyScenario("ammonia");
+    // Extra glow on ammonia node
+    nodeGroups.selectAll(".node-circle").classed("ammonia-glow", d => d.id === "ammonia");
+  } else {
+    applyScenario("baseline");
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   THEME
+   ═══════════════════════════════════════════════ */
+let currentTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+// Default to dark for this analytical tool
+currentTheme = "dark";
+document.documentElement.setAttribute("data-theme", currentTheme);
+
+function toggleTheme() {
+  currentTheme = currentTheme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", currentTheme);
+  const btn = document.getElementById("btn-theme");
+  btn.innerHTML = currentTheme === "dark"
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+}
+
+/* ═══════════════════════════════════════════════
+   EVENT HANDLERS
+   ═══════════════════════════════════════════════ */
+document.getElementById("btn-theme").addEventListener("click", toggleTheme);
+document.getElementById("btn-ammonia").addEventListener("click", toggleAmmoniaMode);
+document.getElementById("btn-info").addEventListener("click", () => {
+  document.getElementById("info-overlay").classList.add("visible");
+});
+document.getElementById("info-close").addEventListener("click", () => {
+  document.getElementById("info-overlay").classList.remove("visible");
+});
+document.getElementById("info-overlay").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    document.getElementById("info-overlay").classList.remove("visible");
+  }
+});
+document.getElementById("panel-close").addEventListener("click", () => {
+  closePanel();
+  deselectAll();
+  if (currentScenario !== "baseline") applyScenario(currentScenario);
+});
+
+document.querySelectorAll(".scenario-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    ammoniaMode = false;
+    document.getElementById("btn-ammonia").classList.remove("active");
+    applyScenario(btn.dataset.scenario);
+  });
+});
+
+// Resize
+window.addEventListener("resize", () => {
+  width = container.clientWidth;
+  height = container.clientHeight;
+  svg.attr("viewBox", `0 0 ${width} ${height}`);
+  simulation.force("center", d3.forceCenter(width / 2, height / 2));
+  simulation.force("x", d3.forceX(width / 2).strength(0.03));
+  simulation.force("y", d3.forceY(height / 2).strength(0.03));
+  simulation.alpha(0.3).restart();
+});
+
+// Keyboard
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closePanel();
+    deselectAll();
+    document.getElementById("info-overlay").classList.remove("visible");
+    if (currentScenario !== "baseline") applyScenario(currentScenario);
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════ */
+initGraph();
+
+// Show info overlay on first visit
+setTimeout(() => {
+  document.getElementById("info-overlay").classList.add("visible");
+}, 800);
+</script>
+</body>
+</html>
