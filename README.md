@@ -8,6 +8,14 @@ An interactive 3D model of **15 interconnected global systems** visualized as a 
 
 **[→ View the Interactive Model](https://stewalexander-com.github.io/global-tensor-network/)**
 
+### Video walkthrough
+
+Screen recording of the **[live demo](https://stewalexander-com.github.io/global-tensor-network/)** in action — orbit and zoom the network, inspect nodes and edges, run scenarios, and use the desktop or mobile panels.
+
+<a href="https://www.youtube.com/watch?v=mSIXDoAEVwM"><img src="https://img.youtube.com/vi/mSIXDoAEVwM/maxresdefault.jpg" alt="YouTube walkthrough: Global Systems Tensor Network — click to play" width="100%" /></a>
+
+**[Play on YouTube →](https://www.youtube.com/watch?v=mSIXDoAEVwM)**
+
 ## Screenshots
 
 ### Desktop — 3D Network with Info Panel
