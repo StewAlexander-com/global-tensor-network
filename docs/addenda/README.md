@@ -11,8 +11,8 @@ One-page, verified evidence briefs for specific nodes in the Global Systems Tens
 ## Addendum 01 — Ammonia as a hydrogen carrier
 
 <p align="center">
-  <a href="./Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">
-    <img src="./addendum_01_thumb.png" alt="Addendum 01 — Ammonia is a high-density H₂ energy carrier (click to open PDF)" width="720" />
+  <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">
+    <img src="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/addendum_01_thumb.png" alt="Addendum 01 — Ammonia is a high-density H₂ energy carrier (click to open PDF)" width="720" />
   </a>
   <br />
   <sub><em>Click to open the PDF</em></sub>
