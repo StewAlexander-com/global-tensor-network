@@ -6,7 +6,7 @@ One-page, verified evidence briefs for specific nodes in the Global Systems Tens
 
 | #  | Node              | Title                                                                                             | File                                                                                                 |
 |----|-------------------|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| 01 | `energy_density`  | Ammonia is a high-density H₂ carrier                                                              | [Ammonia_Hydrogen_Carrier_Executive_Summary.pdf](./Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)   |
+| 01 | `energy_density`  | Ammonia is a high-density H₂ energy carrier                                                       | [Ammonia_Hydrogen_Carrier_Executive_Summary.pdf](./Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)   |
 
 ## Addendum 01 — Ammonia as a hydrogen carrier
 
