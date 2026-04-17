@@ -10,6 +10,14 @@ One-page, verified evidence briefs for specific nodes in the Global Systems Tens
 
 ## Addendum 01 — Ammonia as a hydrogen carrier
 
+<p align="center">
+  <a href="./Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">
+    <img src="./addendum_01_thumb.png" alt="Addendum 01 — Ammonia is a high-density H₂ energy carrier (click to open PDF)" width="720" />
+  </a>
+  <br />
+  <sub><em>Click to open the PDF</em></sub>
+</p>
+
 Supports the repo claim that NH₃ is an efficient hydrogen carrier on the `energy_density → ammonia` edge.
 
 Headline figures (all linked to primary sources inside the PDF):

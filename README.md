@@ -63,6 +63,14 @@ This model maps 15 global systems with push/pull couplings between them. Each ed
 
 One-page, verified evidence briefs for specific nodes in the network. Each addendum cites primary literature and maps directly onto the repo's model.
 
+<p align="center">
+  <a href="./docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">
+    <img src="./docs/addenda/addendum_01_thumb.png" alt="Addendum 01 — Ammonia is a high-density H₂ energy carrier (click to open PDF)" width="720" />
+  </a>
+  <br />
+  <sub><em>Addendum 01 — click to open the PDF</em></sub>
+</p>
+
 | #  | Node             | Title                                       | PDF                                                                                                                         |
 |----|------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | 01 | `energy_density` | Ammonia is a high-density H₂ energy carrier | [Ammonia_Hydrogen_Carrier_Executive_Summary.pdf](./docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)              |
