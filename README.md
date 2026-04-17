@@ -63,17 +63,38 @@ This model maps 15 global systems with push/pull couplings between them. Each ed
 
 One-page, verified evidence briefs for specific nodes in the network. Each addendum cites primary literature and maps directly onto the repo's model.
 
+### Addendum 01 — Ammonia is a high-density H₂ energy carrier
+
 <p align="center">
   <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">
     <img src="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/addendum_01_thumb.png" alt="Addendum 01 — Ammonia is a high-density H₂ energy carrier (click to open PDF)" width="720" />
   </a>
   <br />
-  <sub><em>Addendum 01 — click to open the PDF</em></sub>
+  <sub>
+    <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">Open in browser</a>
+    &nbsp;·&nbsp;
+    <a href="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf">⬇ Download PDF</a>
+  </sub>
 </p>
 
-| #  | Node             | Title                                       | PDF                                                                                                                         |
-|----|------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| 01 | `energy_density` | Ammonia is a high-density H₂ energy carrier | [Ammonia_Hydrogen_Carrier_Executive_Summary.pdf](./docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)              |
+### Addendum 02 — Energy density is the #1 leverage in the model
+
+<p align="center">
+  <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Energy_Density_Leverage_Executive_Summary.pdf">
+    <img src="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/addendum_02_thumb.png" alt="Addendum 02 — Energy density is the #1 leverage in the model (click to open PDF)" width="720" />
+  </a>
+  <br />
+  <sub>
+    <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Energy_Density_Leverage_Executive_Summary.pdf">Open in browser</a>
+    &nbsp;·&nbsp;
+    <a href="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Energy_Density_Leverage_Executive_Summary.pdf">⬇ Download PDF</a>
+  </sub>
+</p>
+
+| #  | Node             | Title                                                       | Open                                                                                                                         | Download                                                                                                                                                     |
+|----|------------------|-------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 01 | `energy_density` | Ammonia is a high-density H₂ energy carrier                 | [View](https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf) | [⬇ PDF](https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)          |
+| 02 | `energy_density` | Energy density is the #1 leverage in the model              | [View](https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Energy_Density_Leverage_Executive_Summary.pdf)  | [⬇ PDF](https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Energy_Density_Leverage_Executive_Summary.pdf)           |
 
 See [`docs/addenda/`](./docs/addenda/) for the full index.
 
