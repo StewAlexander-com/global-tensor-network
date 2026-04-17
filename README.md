@@ -59,6 +59,16 @@ This model maps 15 global systems with push/pull couplings between them. Each ed
 | Global Supply Chains | Infrastructure | Just-in-time vulnerability |
 | Financial Markets | Economic | Oil price → global commodity cascade |
 
+## Addenda
+
+One-page, verified evidence briefs for specific nodes in the network. Each addendum cites primary literature and maps directly onto the repo's model.
+
+| #  | Node             | Title                                       | PDF                                                                                                                         |
+|----|------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| 01 | `energy_density` | Ammonia is a high-density H₂ carrier        | [Ammonia_Hydrogen_Carrier_Executive_Summary.pdf](./docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)              |
+
+See [`docs/addenda/`](./docs/addenda/) for the full index.
+
 ## Features
 
 ### 3D Visualization
