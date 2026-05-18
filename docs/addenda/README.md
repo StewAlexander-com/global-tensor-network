@@ -8,6 +8,7 @@ One-page, verified evidence briefs for specific nodes in the Global Systems Tens
 |----|-------------------|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | 01 | `energy_density`  | Ammonia is a high-density H₂ energy carrier                 | [View](./Ammonia_Hydrogen_Carrier_Executive_Summary.pdf)                                                | [⬇ PDF](https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Ammonia_Hydrogen_Carrier_Executive_Summary.pdf) |
 | 02 | `energy_density`  | Energy density is the #1 leverage in the model              | [View](./Energy_Density_Leverage_Executive_Summary.pdf)                                                 | [⬇ PDF](https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Energy_Density_Leverage_Executive_Summary.pdf) |
+| 03 | `energy_density`  | Power / Energy Density Ideas — 45-lever visual companion    | [View](./Power_Energy_Density_Ideas_Visual_Companion.pdf)                                               | [⬇ PDF](https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Power_Energy_Density_Ideas_Visual_Companion.pdf) |
 
 ## Addendum 01 — Ammonia as a hydrogen carrier
 
@@ -60,3 +61,31 @@ Headline figures (all linked to primary sources inside the PDF):
 - **59.1%** of global electricity still from fossils (Ember 2024); road-EV share only 4 → 17% by 2030 (IEA).
 
 Sources cited in the PDF: repo `index.html`, IPCC AR6 WG3 Ch.6 (2022), Meadows (1999), Systems Thinking Alliance / Abson et al. (2017), IEA WEO 2024, Smil (2022), Ember Global Electricity Review 2025.
+
+## Addendum 03 — Power / Energy Density Ideas (visual companion)
+
+<p align="center">
+  <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Power_Energy_Density_Ideas_Visual_Companion.pdf">
+    <img src="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/addendum_03_thumb.png" alt="Addendum 03 — Power / Energy Density Ideas: 45 levers for more useful output on the same footprint (click to open PDF)" width="720" />
+  </a>
+  <br />
+  <sub>
+    <a href="https://github.com/StewAlexander-com/global-tensor-network/blob/main/docs/addenda/Power_Energy_Density_Ideas_Visual_Companion.pdf">Open in browser</a>
+    &nbsp;·&nbsp;
+    <a href="https://raw.githubusercontent.com/StewAlexander-com/global-tensor-network/main/docs/addenda/Power_Energy_Density_Ideas_Visual_Companion.pdf">⬇ Download PDF</a>
+  </sub>
+</p>
+
+Visual companion to the `energy_density` node. A two-page infographic that separates three constraints often blurred together — energy per kilogram, per litre, and per square metre — and maps 45 physics-grounded levers onto one fixed-footprint frame.
+
+Five lever families (the "Energy Blooms" hero page):
+
+- **Denser fuel** — e.g. nuclear: least land per useful joule.
+- **Stored energy** — e.g. pumped-water storage: ~88% round-trip.
+- **Recovered losses** — e.g. combined heat & power: 65–75% total efficiency.
+- **Harvested flux** — e.g. solar path-to-grid: >40% pathways.
+- **Dual-use space** — roofs + farms + pipes: one footprint, multiple yields.
+
+Appendix decomposes the bloom into 25 space levers, 10 battery moves, and 10 renewable / ammonia moves, each chip plain-English, with symbols decoded in place.
+
+Sources cited in the PDF: OWID land use, DOE (fuels · nuclear · battery research · wind · hydropower · pumped storage · combined heat · hydrogen), NREL (layered solar), IEA (ammonia), Sandia (thermal), EIA (waste heat).
